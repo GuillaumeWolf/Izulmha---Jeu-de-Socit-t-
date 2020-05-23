@@ -2,15 +2,32 @@
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
 
 namespace Jeu_de_Socitété___Izulmha
 {
-    class StartGame
+    class Game
     {
+        private List<Player> _listOfPlayer = new List<Player>();
+        private PilesdeCarte _pilesdeCartes = new PilesdeCarte();
+        private int _TourCount = 0;
+        private Player _CurrentPlayer;
+
+
         static void Main(string[] args)
         {
+            var G = new Game();
+            G.Prepare();
+            G.PlayGame();
+
+        }
+
+        private void Prepare()
+        {
+            //Préparation
             Classes.FillClassList();
             Races.FillRaceList();
+
             //début du jeu
             Console.WriteLine("Hello challenger ! You enter this fantastique World which is Izulmha. In this World you will embody a character with a Race and a Class. Good Game !");
             int NumberOfPlayer = GameMethod.NumberPlayer();
@@ -18,11 +35,28 @@ namespace Jeu_de_Socitété___Izulmha
             {
                 Console.WriteLine("Player {0}:\n", i);
                 Player p1 = Player.CreatNewRandomPlayer();
-                Player.ListOfPlayer.Add(p1);
+                _listOfPlayer.Add(p1);
                 p1.WritePlayerDescritpion();
                 p1.WritePlayerStats();
             }
 
+        }
+        private void PlayGame()
+        {
+            while(true)
+            {                
+                _TourCount++;
+                Console.WriteLine("Turn : {0}\n", _TourCount);
+
+                for (int i = 0; i< _listOfPlayer.Count; i++)
+                {
+                    Console.WriteLine("Player {0} is playing.", i + 1);
+                    _listOfPlayer[i].Play(_pilesdeCartes);
+                    Console.WriteLine("Player {0} finished his turn.", i + 1);
+                }
+
+                Console.ReadLine();
+            }
         }
     }
 
@@ -33,14 +67,14 @@ namespace Jeu_de_Socitété___Izulmha
         {
             while(true)
             {
-                Console.WriteLine("How many Challenger want to play ? (max {0})", 4);
+                Console.WriteLine("How many Challenger want to play ? (min {1} - max {0})", 4, 2);
                 Console.Write(" --> ");
                 string rep1 = Console.ReadLine();
                 int NumberOfPlayer = 0;
                 try
                 {
                     NumberOfPlayer = Convert.ToInt32(rep1);
-                    if (NumberOfPlayer <= 4 && NumberOfPlayer > 0)
+                    if (NumberOfPlayer <= 4 && NumberOfPlayer > 1)
                     {
                         return NumberOfPlayer;
                     }

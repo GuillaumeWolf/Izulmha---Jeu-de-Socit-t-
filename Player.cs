@@ -22,14 +22,11 @@ namespace Jeu_de_Socitété___Izulmha
             //Mana
         public int Mana = 0;
 
-        #endregion
-
-
-        #region public static Properties and Array
-        public static List<Player> ListOfPlayer = new List<Player>();
-
+        // Cartes
+        PlayerHand Cards = new PlayerHand();
 
         #endregion
+
 
 
         public Player(string nameInput, Classes classofplayer, Races raceofplayer)
@@ -66,6 +63,7 @@ namespace Jeu_de_Socitété___Izulmha
         {
 
         }
+
         private static string ChooseName()
         {
             while (true)
@@ -86,14 +84,22 @@ namespace Jeu_de_Socitété___Izulmha
                 }
             }
         }
-        
+
+        internal void Play(PilesdeCarte pilesdeCartes)
+        {
+            //1
+            Console.WriteLine("Draw some cards.");
+            string choosenPile = "Object";
+            Cards.DrawCard(pilesdeCartes, 2, choosenPile);
+        }
+
 
 
         //Methode du player en jeu
         public void WritePlayerDescritpion()
         {
             Console.WriteLine("Hello, my name is {0} the {1} and I am a {2}.", PlayerName, PlayerRace.Name, PlayerClass.Name);
-        }
+        }   
         public void WritePlayerStats()
         {
             Console.WriteLine("Attack Physic: {0}, Resistance Physic: {1}, Attack Magic: {2},Restistance Magic: {3}, Mana: {4}.", AP, RP, AM, RM, Mana);
