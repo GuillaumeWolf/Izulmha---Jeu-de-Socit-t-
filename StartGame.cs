@@ -23,7 +23,6 @@ namespace Jeu_de_Socitété___Izulmha
                 p1.WritePlayerStats();
             }
 
-
         }
     }
 
