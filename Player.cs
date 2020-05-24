@@ -13,17 +13,22 @@ namespace Jeu_de_Socitété___Izulmha
         public Classes PlayerClass;
         public Races PlayerRace;
         //Stats
-            //Dégats Physique
-        public int AP = 0;
-        public int RP = 0;
-            //Dégats Magique
-        public int AM = 0;
-        public int RM = 0;
+        //Physique
+        public int BasicStrength = 1;
+        public int Strength;
+        //Magique
+        public int BasicPower = 1;
+        public int Power;
             //Mana
-        public int Mana = 0;
+        public int ManaGemme = 10;
+        public int Mana;
 
         // Cartes
-        PlayerHand Cards = new PlayerHand();
+        public PlayerHand Cards = new PlayerHand();
+
+        //Etat
+        public enum PlayerStatsEnum { NotIsTurn, Drawing, ChoosingPile, PlayingObject, ChoosingObject, ChoosingSpell, Fighting, GivingCard }
+        public PlayerStatsEnum PlayerStats;
 
         #endregion
 
@@ -34,6 +39,9 @@ namespace Jeu_de_Socitété___Izulmha
             PlayerName = nameInput;
             PlayerClass = classofplayer;
             PlayerRace = raceofplayer;
+            Mana = ManaGemme;
+            Strength = BasicStrength;
+            Power = BasicPower;
         }
 
         //Crée un joueur
@@ -87,10 +95,21 @@ namespace Jeu_de_Socitété___Izulmha
 
         internal void Play(PilesdeCarte pilesdeCartes)
         {
+            ManaGemme += 1;
+            Console.WriteLine("You get 1 Mana Gemme. And the other are full. You got {0} Mana.", ManaGemme);
             //1
-            Console.WriteLine("Draw some cards.");
-            string choosenPile = "Object";
-            Cards.DrawCard(pilesdeCartes, 2, choosenPile);
+            Console.Write("\n1. Draw Card");
+            PlayerStats = PlayerStatsEnum.Drawing;
+            Commande.AllCommande(this, pilesdeCartes);
+            Commande.AllCommande(this, pilesdeCartes);
+            Commande.AllCommande(this, pilesdeCartes);
+            Commande.AllCommande(this, pilesdeCartes);
+
+
+            //2
+            Console.Write("\n2. Play Card");
+            PlayerStats = PlayerStatsEnum.PlayingObject;
+            Commande.AllCommande(this, pilesdeCartes);
         }
 
 
@@ -102,7 +121,7 @@ namespace Jeu_de_Socitété___Izulmha
         }   
         public void WritePlayerStats()
         {
-            Console.WriteLine("Attack Physic: {0}, Resistance Physic: {1}, Attack Magic: {2},Restistance Magic: {3}, Mana: {4}.", AP, RP, AM, RM, Mana);
+            Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}.", Strength, Power, ManaGemme);
         }
 
 

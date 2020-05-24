@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Jeu_de_Socitété___Izulmha
@@ -8,18 +9,32 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public List<Object> PileObject = new List<Object>();
         public List<Spell> PileSpell = new List<Spell>();
+        public List<Monster> PileMonster = new List<Monster>();
+
         public List<Object> DeffausseObject = new List<Object>();
         public List<Spell> DeffausseSpell = new List<Spell>();
+        public List<Monster> DeffausseMonster = new List<Monster>();
 
         public PilesdeCarte()
         {
-            for (int i = 0; i < 20; i++)
-            {
-                PileObject.Add(new BasicSword());
-            }
+            //Objet
             for (int i = 0; i < 5; i++)
             {
-                DeffausseObject.Add(new BasicSword());
+                PileObject.Add(new BasicSword());
+                PileObject.Add(new BasicHelmet());
+                PileObject.Add(new MagicOrb());
+                PileObject.Add(new SmallArmor());
+            }
+            //Spell
+            for (int i = 0; i < 10; i++)
+            {
+                PileSpell.Add(new Enchantement());
+                PileSpell.Add(new MagicEnchantement());
+            }
+            //Monster
+            for (int i = 0; i < 20; i++)
+            {
+                PileMonster.Add(new Gobelin());
             }
         }
 
@@ -37,7 +52,7 @@ namespace Jeu_de_Socitété___Izulmha
                         PileObject.Add(c2);
                     }
                     DeffausseObject.Clear();
-                    Console.WriteLine("You fill the Object Stack. There is {0} cards left. in the deffause : {1}.", PileObject.Count, DeffausseObject.Count);
+                    Console.WriteLine("You fill the Object Stack. There is {0} cards left. And in the deffause : {1}.", PileObject.Count, DeffausseObject.Count);
                 }
                 if (PileObject.Count == 0)
                 {
@@ -45,7 +60,7 @@ namespace Jeu_de_Socitété___Izulmha
                     return null;
                 }
 
-                    x = Aleatoire.RandomInt(PileObject.Count);
+                x = Aleatoire.RandomInt(PileObject.Count);
                 c = PileObject[x];
                 PileObject.RemoveAt(x);
             }
@@ -58,19 +73,19 @@ namespace Jeu_de_Socitété___Izulmha
                         PileSpell.Add(c2);
                     }
                     DeffausseSpell.Clear();
-                    Console.WriteLine("You fill the Spell Stack. There is {0} cards left. in the deffause : {1}.", PileObject.Count, DeffausseSpell.Count);
+                    Console.WriteLine("You fill the Spell Stack. There is {0} cards left. And in the deffause : {1}.", PileSpell.Count, DeffausseSpell.Count);
                 }
                 if (PileSpell.Count == 0)
                 {
                     Console.WriteLine("There isn't cards in Spell Stack");
                     return null;
                 }
+
                 x = Aleatoire.RandomInt(PileSpell.Count);
                 c = PileSpell[x];
                 PileSpell.RemoveAt(x);
             }
             Console.Write("You draw a {0}. ", c.Name);
-            Console.Write("There is {1} cards.", PileObject.Count);
             Console.WriteLine();
             return c;
         }

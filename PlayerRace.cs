@@ -33,7 +33,7 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public Nain()
         {
-            Name = "Nain";
+            Name = "Dwarf";
         }
     }
     class Orc : Races

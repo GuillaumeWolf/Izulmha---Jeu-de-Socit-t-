@@ -42,7 +42,7 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public Chevalier()
         {
-            Name = "Chevalier";
+            Name = "Knight";
         }
     }
     class Archer : Classes

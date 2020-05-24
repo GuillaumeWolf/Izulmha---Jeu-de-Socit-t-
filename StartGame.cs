@@ -9,7 +9,7 @@ namespace Jeu_de_Socitété___Izulmha
     class Game
     {
         private List<Player> _listOfPlayer = new List<Player>();
-        private PilesdeCarte _pilesdeCartes = new PilesdeCarte();
+        public PilesdeCarte _pilesdeCartes = new PilesdeCarte();
         private int _TourCount = 0;
         private Player _CurrentPlayer;
 
@@ -33,12 +33,17 @@ namespace Jeu_de_Socitété___Izulmha
             int NumberOfPlayer = GameMethod.NumberPlayer();
             for (int i = 0; i < NumberOfPlayer; i++)
             {
-                Console.WriteLine("Player {0}:\n", i);
+                Console.WriteLine("\nPlayer {0}:\n", i+1);
                 Player p1 = Player.CreatNewRandomPlayer();
                 _listOfPlayer.Add(p1);
-                p1.WritePlayerDescritpion();
-                p1.WritePlayerStats();
+
             }
+            for (int i = 0; i < NumberOfPlayer; i++)
+            {
+                _listOfPlayer[i].WritePlayerDescritpion();
+                _listOfPlayer[i].WritePlayerStats();
+            }
+
 
         }
         private void PlayGame()
@@ -46,16 +51,15 @@ namespace Jeu_de_Socitété___Izulmha
             while(true)
             {                
                 _TourCount++;
-                Console.WriteLine("Turn : {0}\n", _TourCount);
+                Console.WriteLine("\n(Turn {0})\n", _TourCount);
 
                 for (int i = 0; i< _listOfPlayer.Count; i++)
                 {
-                    Console.WriteLine("Player {0} is playing.", i + 1);
+                    Console.WriteLine(" - Player {0} is playing. - ", i + 1);
                     _listOfPlayer[i].Play(_pilesdeCartes);
-                    Console.WriteLine("Player {0} finished his turn.", i + 1);
+                    Console.WriteLine(" - Player {0} finished his turn. - \n", i + 1);
                 }
 
-                Console.ReadLine();
             }
         }
     }
