@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Jeu_de_Socitété___Izulmha
@@ -13,22 +15,29 @@ namespace Jeu_de_Socitété___Izulmha
         public Classes PlayerClass;
         public Races PlayerRace;
         //Stats
-        //Physique
+            //Vie
+        public int BasicHP = 10;
+        public int HP;
+            //Physique
         public int BasicStrength = 1;
         public int Strength;
-        //Magique
+            //Magique
         public int BasicPower = 1;
         public int Power;
             //Mana
-        public int ManaGemme = 10;
+        public int ManaGemme = 4;
         public int Mana;
+        //Objets
+        private int MaxHands = 2;
+        private List<Weapon> _weaponsPlayed = new List<Weapon>();
+
 
         // Cartes
         public PlayerHand Cards = new PlayerHand();
 
         //Etat
         public enum PlayerStatsEnum { NotIsTurn, Drawing, ChoosingPile, PlayingObject, ChoosingObject, ChoosingSpell, Fighting, GivingCard }
-        public PlayerStatsEnum PlayerStats;
+        public PlayerStatsEnum PlayerState;
 
         #endregion
 
@@ -39,6 +48,7 @@ namespace Jeu_de_Socitété___Izulmha
             PlayerName = nameInput;
             PlayerClass = classofplayer;
             PlayerRace = raceofplayer;
+            HP = BasicHP;
             Mana = ManaGemme;
             Strength = BasicStrength;
             Power = BasicPower;
@@ -93,23 +103,21 @@ namespace Jeu_de_Socitété___Izulmha
             }
         }
 
-        internal void Play(PilesdeCarte pilesdeCartes)
+        internal void Play(PilesdeCarte pilesdeCartes, Commande C)
         {
             ManaGemme += 1;
             Console.WriteLine("You get 1 Mana Gemme. And the other are full. You got {0} Mana.", ManaGemme);
             //1
             Console.Write("\n1. Draw Card");
-            PlayerStats = PlayerStatsEnum.Drawing;
-            Commande.AllCommande(this, pilesdeCartes);
-            Commande.AllCommande(this, pilesdeCartes);
-            Commande.AllCommande(this, pilesdeCartes);
-            Commande.AllCommande(this, pilesdeCartes);
+            PlayerState = PlayerStatsEnum.Drawing;
+            C.AllCommande(this);
+            C.AllCommande(this);
 
 
             //2
             Console.Write("\n2. Play Card");
-            PlayerStats = PlayerStatsEnum.PlayingObject;
-            Commande.AllCommande(this, pilesdeCartes);
+            PlayerState = PlayerStatsEnum.PlayingObject;
+            C.AllCommande(this);
         }
 
 
@@ -124,6 +132,17 @@ namespace Jeu_de_Socitété___Izulmha
             Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}.", Strength, Power, ManaGemme);
         }
 
+
+        public PlayCardResult PlayWeapon(Weapon w1)
+        {
+            int totalHand = _weaponsPlayed.Select(x => x.HandTake).Sum() + w1.HandTake;
+            if (totalHand > MaxHands)
+            {
+                return PlayCardResult.NoEnoughHand;
+            }
+            _weaponsPlayed.Add(w1);
+            return PlayCardResult.OK;
+        }
 
 
     }

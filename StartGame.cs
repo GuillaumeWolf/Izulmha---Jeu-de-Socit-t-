@@ -12,7 +12,7 @@ namespace Jeu_de_Socitété___Izulmha
         public PilesdeCarte _pilesdeCartes = new PilesdeCarte();
         private int _TourCount = 0;
         private Player _CurrentPlayer;
-
+        private Commande C;
 
         static void Main(string[] args)
         {
@@ -43,7 +43,7 @@ namespace Jeu_de_Socitété___Izulmha
                 _listOfPlayer[i].WritePlayerDescritpion();
                 _listOfPlayer[i].WritePlayerStats();
             }
-
+            C = new Commande(_pilesdeCartes);
 
         }
         private void PlayGame()
@@ -56,8 +56,8 @@ namespace Jeu_de_Socitété___Izulmha
                 for (int i = 0; i< _listOfPlayer.Count; i++)
                 {
                     Console.WriteLine(" - Player {0} is playing. - ", i + 1);
-                    _listOfPlayer[i].Play(_pilesdeCartes);
-                    Console.WriteLine(" - Player {0} finished his turn. - \n", i + 1);
+                    _listOfPlayer[i].Play(_pilesdeCartes, C);
+                    Console.WriteLine(" - Player {0} finished his turn. - \n\n", i + 1);
                 }
 
             }
