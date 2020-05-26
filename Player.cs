@@ -14,6 +14,7 @@ namespace Jeu_de_Socitété___Izulmha
         public string PlayerName;
         public Classes PlayerClass;
         public Races PlayerRace;
+        public int number;
         //Stats
             //Vie
         public int BasicHP = 10;
@@ -25,23 +26,53 @@ namespace Jeu_de_Socitété___Izulmha
         public int BasicPower = 1;
         public int Power;
             //Mana
-        public int ManaGemme = 4;
+        public int ManaGemme = 3;
         public int Mana;
         //Objets
-        private int MaxHands = 2;
-        private List<Weapon> _weaponsPlayed = new List<Weapon>();
-
+        public int MaxHands = 2;
+        public List<Weapon> _weaponsPlayed = new List<Weapon>();
+        public Armor _armorPlayed = null;
+        public Helmet _helmetPlayed = null;
+        public Shoe _shoesPlayed = null;
+        public List<Amulette> _amulettePlayed = new List<Amulette>();
+        public List<Pets> _petsPlayed = new List<Pets>();
 
         // Cartes
         public PlayerHand Cards = new PlayerHand();
 
         //Etat
-        public enum PlayerStatsEnum { NotIsTurn, Drawing, ChoosingPile, PlayingObject, ChoosingObject, ChoosingSpell, Fighting, GivingCard }
+        public enum PlayerStatsEnum 
+        { 
+            NotIsTurn, 
+            //1
+            Drawing, 
+            ChoosingPile, 
+            //2
+            PlayingObject, 
+            ChoosingObject, 
+            ChoosingSpell, 
+            ChangingWeapon, 
+            ChoosingWeapon, 
+            ChangingArmor, 
+            ChangingHelmet, 
+            ChangingShoe,
+            //3
+            ChoosingPets,
+            ChoosingDamage,
+            Fighting, 
+            //4
+            GivingCard,
+            //Autre
+            ChoosingPlayer
+        }
         public PlayerStatsEnum PlayerState;
+        public PlayerStatsEnum LastStates;
 
         #endregion
 
-
+        //Fight
+        public bool FightWithStrength = true;
+        public NormalMonster FightMonster = null;
 
         public Player(string nameInput, Classes classofplayer, Races raceofplayer)
         {
@@ -106,7 +137,8 @@ namespace Jeu_de_Socitété___Izulmha
         internal void Play(PilesdeCarte pilesdeCartes, Commande C)
         {
             ManaGemme += 1;
-            Console.WriteLine("You get 1 Mana Gemme. And the other are full. You got {0} Mana.", ManaGemme);
+            Mana = ManaGemme;
+            Console.WriteLine("You get 1 Mana Gemme. And the other are fill. You got {0} Mana.", ManaGemme);
             //1
             Console.Write("\n1. Draw Card");
             PlayerState = PlayerStatsEnum.Drawing;
@@ -118,6 +150,30 @@ namespace Jeu_de_Socitété___Izulmha
             Console.Write("\n2. Play Card");
             PlayerState = PlayerStatsEnum.PlayingObject;
             C.AllCommande(this);
+
+            //3
+            Console.Write("\n3. Fight a random Monster. ");
+            Monster m1 =  Cards.DrawMonster(pilesdeCartes);
+            
+            if (m1 is NormalMonster)
+            {
+                FightMonster = m1 as NormalMonster;
+            }
+            else
+            {
+                //Consigne pour le boss
+            }
+            Console.Write("You are facing ", FightMonster.Name);
+            FightMonster.ShowCard();
+
+            PlayerState = PlayerStatsEnum.ChoosingPets;
+            C.AllCommande(this); 
+            PlayerState = PlayerStatsEnum.ChoosingDamage;
+            C.AllCommande(this);
+            PlayerState = PlayerStatsEnum.Fighting;
+            C.AllCommande(this);
+
+
         }
 
 
@@ -126,13 +182,329 @@ namespace Jeu_de_Socitété___Izulmha
         public void WritePlayerDescritpion()
         {
             Console.WriteLine("Hello, my name is {0} the {1} and I am a {2}.", PlayerName, PlayerRace.Name, PlayerClass.Name);
-        }   
+        }
         public void WritePlayerStats()
         {
-            Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}.", Strength, Power, ManaGemme);
+            int x = 1;
+            x += 2;
+            if (PlayerState != PlayerStatsEnum.Fighting)
+            {
+                Console.WriteLine("{0} the {1} {2}:", PlayerName, PlayerClass.Name, PlayerRace.Name);
+                int? totalStrength = Strength;
+                int? totalPower = Power;
+                int? totalMana = Mana;
+                int? totalManaGemme = ManaGemme;
+                int longWeapon = _weaponsPlayed.Count;
+                for (int i = 0; i < longWeapon; i++)
+                {
+                    if (_weaponsPlayed[i].Strength.HasValue)
+                    {
+                        totalStrength += _weaponsPlayed[i].Strength;
+                    }
+                    if (_weaponsPlayed[i].Power.HasValue)
+                    {
+                        totalPower += _weaponsPlayed[i].Power;
+                    }
+                    if (_weaponsPlayed[i].Mana.HasValue)
+                    {
+                        totalMana += _weaponsPlayed[i].Mana;
+                        totalManaGemme += _weaponsPlayed[i].Mana;
+                    }
+                    Console.Write("Weapon {0}: {1}. ", i + 1, _weaponsPlayed[i].Name);
+                }
+                if (longWeapon == 0) { Console.Write("No Weapons. "); }
+
+                if (_armorPlayed != null)
+                {
+                    if (_armorPlayed.Strength.HasValue)
+                    {
+                        totalStrength += _armorPlayed.Strength;
+                    }
+                    if (_armorPlayed.Power.HasValue)
+                    {
+                        totalPower += _armorPlayed.Power;
+                    }
+                    if (_armorPlayed.Mana.HasValue)
+                    {
+                        totalMana += _armorPlayed.Mana;
+                        totalManaGemme += _armorPlayed.Mana;
+                    }
+                    Console.Write("Armor: {0}. ", _armorPlayed.Name);
+                }
+                else { Console.Write("No Armor. "); }
+
+                if (_helmetPlayed != null)
+                {
+                    if (_helmetPlayed.Strength.HasValue)
+                    {
+                        totalStrength += _helmetPlayed.Strength;
+                    }
+                    if (_helmetPlayed.Power.HasValue)
+                    {
+                        totalPower += _helmetPlayed.Power;
+                    }
+                    if (_helmetPlayed.Mana.HasValue)
+                    {
+                        totalMana += _helmetPlayed.Mana;
+                        totalManaGemme += _helmetPlayed.Mana;
+                    }
+                    Console.Write("Helmet: {0}. ", _helmetPlayed.Name);
+                }
+                else { Console.Write("No Helmet. "); }
+
+                int longAmulette = _amulettePlayed.Count;
+                for (int i = 0; i < longAmulette; i++)
+                {
+                    if (_amulettePlayed[i].Strength.HasValue)
+                    {
+                        totalStrength += _amulettePlayed[i].Strength;
+                    }
+                    if (_amulettePlayed[i].Power.HasValue)
+                    {
+                        totalPower += _amulettePlayed[i].Power;
+                    }
+                    if (_amulettePlayed[i].Mana.HasValue)
+                    {
+                        totalMana += _amulettePlayed[i].Mana;
+                        totalManaGemme += _amulettePlayed[i].Mana;
+                    }
+                    Console.Write("Amulette {0}: {1}. ", i + 1, _amulettePlayed[i].Name);
+                }
+                if (longAmulette == 0) { Console.Write("No Amulette. "); }
+
+                int longPets = _petsPlayed.Count;
+                for (int i = 0; i < longPets; i++)
+                {
+                    //totalStrength += _petsPlayed[i].Puissance;
+                    if (_petsPlayed[i].Mana.HasValue)
+                    {
+                        totalMana += _petsPlayed[i].Mana;
+                        totalManaGemme += _petsPlayed[i].Mana;
+                    }
+                    Console.Write("Pets {0}: {1}. ", i + 1, _petsPlayed[i].Name);
+                }
+                if (longPets == 0) { Console.Write("No Pets. "); }
+
+                Console.WriteLine();
+                Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}/{3}.", totalStrength, totalPower, totalMana, totalManaGemme);
+            }
+            else 
+            {
+                Console.Write("{0} the {1} {2}:", PlayerName, PlayerClass.Name, PlayerRace.Name);
+                if (FightWithStrength)
+                {
+                    int? totalStrength = Strength;
+                    int longWeapon = _weaponsPlayed.Count;
+                    for (int i = 0; i < longWeapon; i++)
+                    {
+                        if (_weaponsPlayed[i].Strength.HasValue)
+                        {
+                            totalStrength += _weaponsPlayed[i].Strength;
+                        }
+                        Console.Write("Weapon {0}: {1}. ", i + 1, _weaponsPlayed[i].Name);
+                    }
+                    if (longWeapon == 0) { Console.Write("No Weapons. "); }
+
+                    if (_armorPlayed != null)
+                    {
+                        if (_armorPlayed.Strength.HasValue)
+                        {
+                            totalStrength += _armorPlayed.Strength;
+                        }
+                        Console.Write("Armor: {0}. ", _armorPlayed.Name);
+                    }
+                    else { Console.Write("No Armor. "); }
+
+                    if (_helmetPlayed != null)
+                    {
+                        if (_helmetPlayed.Strength.HasValue)
+                        {
+                            totalStrength += _helmetPlayed.Strength;
+                        }
+                        Console.Write("Helmet: {0}. ", _helmetPlayed.Name);
+                    }
+                    else { Console.Write("No Helmet. "); }
+
+                    int longAmulette = _amulettePlayed.Count;
+                    for (int i = 0; i < longAmulette; i++)
+                    {
+                        if (_amulettePlayed[i].Strength.HasValue)
+                        {
+                            totalStrength += _amulettePlayed[i].Strength;
+                        }
+                        Console.Write("Amulette {0}: {1}. ", i + 1, _amulettePlayed[i].Name);
+                    }
+                    if (longAmulette == 0) { Console.Write("No Amulette. "); }
+
+                    int longPets = _petsPlayed.Count;
+                    for (int i = 0; i < longPets; i++)
+                    {
+                        if (_petsPlayed[i].inFight)
+                        {
+                            totalStrength += _petsPlayed[i].Puissance;
+                        }
+                        Console.Write("Pets {0}: {1}. ", i + 1, _petsPlayed[i].Name);
+                    }
+                    if (longPets == 0) { Console.Write("No Pets. "); }
+                    Console.WriteLine();
+                    Console.WriteLine("Total Puissance: {0}", totalStrength);
+                }
+                else
+                {
+                    int? totalStrength = Power;
+                    int longWeapon = _weaponsPlayed.Count;
+                    for (int i = 0; i < longWeapon; i++)
+                    {
+                        if (_weaponsPlayed[i].Power.HasValue)
+                        {
+                            totalStrength += _weaponsPlayed[i].Power;
+                        }
+                        Console.Write("Weapon {0}: {1}. ", i + 1, _weaponsPlayed[i].Name);
+                    }
+                    if (longWeapon == 0) { Console.Write("No Weapons. "); }
+
+                    if (_armorPlayed != null)
+                    {
+                        if (_armorPlayed.Power.HasValue)
+                        {
+                            totalStrength += _armorPlayed.Power;
+                        }
+                        Console.Write("Armor: {0}. ", _armorPlayed.Name);
+                    }
+                    else { Console.Write("No Armor. "); }
+
+                    if (_helmetPlayed != null)
+                    {
+                        if (_helmetPlayed.Power.HasValue)
+                        {
+                            totalStrength += _helmetPlayed.Power;
+                        }
+                        Console.Write("Helmet: {0}. ", _helmetPlayed.Name);
+                    }
+                    else { Console.Write("No Helmet. "); }
+
+                    int longAmulette = _amulettePlayed.Count;
+                    for (int i = 0; i < longAmulette; i++)
+                    {
+                        if (_amulettePlayed[i].Power.HasValue)
+                        {
+                            totalStrength += _amulettePlayed[i].Power;
+                        }
+                        Console.Write("Amulette {0}: {1}. ", i + 1, _amulettePlayed[i].Name);
+                    }
+                    if (longAmulette == 0) { Console.Write("No Amulette. "); }
+
+                    int longPets = _petsPlayed.Count;
+                    for (int i = 0; i < longPets; i++)
+                    {
+                        if (_petsPlayed[i].inFight)
+                        {
+                            totalStrength += _petsPlayed[i].Puissance;
+                        }
+                        Console.Write("Pets {0}: {1}. ", i + 1, _petsPlayed[i].Name);
+                    }
+                    if (longPets == 0) { Console.Write("No Pets. "); }
+                    Console.WriteLine();
+                    Console.WriteLine("Total Puissance: {0}", totalStrength);
+                }
+            }
+        }
+        public int? GetTotalStrength()
+        {
+            int? totalStrength = Strength;
+            int longWeapon = _weaponsPlayed.Count;
+            for (int i = 0; i < longWeapon; i++)
+            {
+                if (_weaponsPlayed[i].Strength.HasValue)
+                {
+                    totalStrength += _weaponsPlayed[i].Strength;
+                }
+            }
+
+            if (_armorPlayed != null)
+            {
+                if (_armorPlayed.Strength.HasValue)
+                {
+                    totalStrength += _armorPlayed.Strength;
+                }
+            }
+
+            if (_helmetPlayed != null)
+            {
+                if (_helmetPlayed.Strength.HasValue)
+                {
+                    totalStrength += _helmetPlayed.Strength;
+                }
+            }
+
+            int longAmulette = _amulettePlayed.Count;
+            for (int i = 0; i < longAmulette; i++)
+            {
+                if (_amulettePlayed[i].Strength.HasValue)
+                {
+                    totalStrength += _amulettePlayed[i].Strength;
+                }
+            }
+
+            int longPets = _petsPlayed.Count;
+            for (int i = 0; i < longPets; i++)
+            {
+                if (_petsPlayed[i].inFight)
+                {
+                    totalStrength += _petsPlayed[i].Puissance;
+                }
+            }
+            return totalStrength;
+        }
+        public int? GetTotalPower()
+        {
+            int? totalPower = Power;
+            int longWeapon = _weaponsPlayed.Count;
+            for (int i = 0; i < longWeapon; i++)
+            {
+                if (_weaponsPlayed[i].Power.HasValue)
+                {
+                    totalPower += _weaponsPlayed[i].Power;
+                }
+            }
+
+            if (_armorPlayed != null)
+            {
+                if (_armorPlayed.Power.HasValue)
+                {
+                    totalPower += _armorPlayed.Power;
+                }
+            }
+
+            if (_helmetPlayed != null)
+            {
+                if (_helmetPlayed.Power.HasValue)
+                {
+                    totalPower += _helmetPlayed.Power;
+                }
+            }
+
+            int longAmulette = _amulettePlayed.Count;
+            for (int i = 0; i < longAmulette; i++)
+            {
+                if (_amulettePlayed[i].Power.HasValue)
+                {
+                    totalPower += _amulettePlayed[i].Power;
+                }
+            }
+
+            int longPets = _petsPlayed.Count;
+            for (int i = 0; i < longPets; i++)
+            {
+                if (_petsPlayed[i].inFight)
+                {
+                    totalPower += _petsPlayed[i].Puissance;
+                }
+            }
+            return totalPower;
         }
 
-
+        //Ajoute des Cartes
         public PlayCardResult PlayWeapon(Weapon w1)
         {
             int totalHand = _weaponsPlayed.Select(x => x.HandTake).Sum() + w1.HandTake;
@@ -143,7 +515,40 @@ namespace Jeu_de_Socitété___Izulmha
             _weaponsPlayed.Add(w1);
             return PlayCardResult.OK;
         }
-
-
+        public PlayCardResult PlayArmor(Armor a1)
+        {
+            if (_armorPlayed != null)
+            {
+                return PlayCardResult.NoEnoughBody;
+            }
+            _armorPlayed = a1;
+            return PlayCardResult.OK;
+        }
+        public PlayCardResult PlayHelmet(Helmet h1)
+        {
+            if (_helmetPlayed != null)
+            {
+                return PlayCardResult.NoEnoughHead;
+            }
+            _helmetPlayed = h1;
+            return PlayCardResult.OK;
+        }
+        public PlayCardResult PlayShoe (Shoe s1)
+        {
+            if (_shoesPlayed != null)
+            {
+                return PlayCardResult.NoEnoughFeet;
+            }
+        _shoesPlayed = s1;
+            return PlayCardResult.OK;
+        }
+        public void PlayAmulette(Amulette a1)
+        {
+            _amulettePlayed.Add(a1);
+        }
+        public void PlayPets(Pets p1)
+        {
+            _petsPlayed.Add(p1);
+        }
     }
 }

@@ -20,23 +20,53 @@ namespace Jeu_de_Socitété___Izulmha
             //Objet
             for (int i = 0; i < 1; i++)
             {
+                //Mythical
+
+                //Legendary
+
             }
             for (int i = 0; i < 2; i++)
             {
+                //Common
                 PileObject.Add(new DoubleSword());
                 PileObject.Add(new MagicGauntlet());
+                //Rare
+                PileObject.Add(new LongSword());
+                PileObject.Add(new BigMagicOrb());
+                PileObject.Add(new BigSpear());
+                PileObject.Add(new DoubleManaSword());
+                PileObject.Add(new IronShield());
+                PileObject.Add(new GiantShield());
+                PileObject.Add(new ReinforcedChestplate());
+                PileObject.Add(new MagicArmor());
+                PileObject.Add(new VikingHelmet());
+                PileObject.Add(new IronHat());
+                PileObject.Add(new SpeedShoes());
+                PileObject.Add(new ArmedShoes());
+                PileObject.Add(new WitchBracelet());
+                PileObject.Add(new LeaderCape());
+                PileObject.Add(new WolfPack());
+                PileObject.Add(new WildParrot());
+                PileObject.Add(new Reel());
+
             }
             for (int i = 0; i < 3; i++)
             {
+                //Common
                 PileObject.Add(new BasicSword());
                 PileObject.Add(new MagicOrb());
                 PileObject.Add(new SmallShield());
                 PileObject.Add(new MagicShield());
-                PileObject.Add(new SmallArmor());
-                PileObject.Add(new MagicArmor());
+                PileObject.Add(new Chestplate());
+                PileObject.Add(new MagicChestplate());
+                PileObject.Add(new MagicHelmet());
                 PileObject.Add(new BasicHelmet());
+                PileObject.Add(new NormalShoes());
                 PileObject.Add(new StrengthCollar());
                 PileObject.Add(new MagicRing());
+                PileObject.Add(new SmallWolf());
+                PileObject.Add(new TotemOfStrength());
+                PileObject.Add(new GratefulTraveler());
             }
             
             //Spell
@@ -46,7 +76,7 @@ namespace Jeu_de_Socitété___Izulmha
                 PileSpell.Add(new AntiArmorSpell());
                 PileSpell.Add(new AntiHelmetSpell());
                 PileSpell.Add(new AntiAmuletteSpell());
-                PileSpell.Add(new AntiPetsSpell());
+                PileSpell.Add(new DamagePetsSpell());
             }
             for (int i = 0; i < 2; i++)
             {
@@ -65,9 +95,19 @@ namespace Jeu_de_Socitété___Izulmha
                 PileSpell.Add(new ManaFlask());
             }
             //Monster
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 1; i++)
             {
-                PileMonster.Add(new Gobelin());
+                PileMonster.Add(new Slime());
+                PileMonster.Add(new GiantTortoise());
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                PileMonster.Add(new GreenGobelin());
+                PileMonster.Add(new GreatSandScorpion());
+                PileMonster.Add(new GraveHaunt());
+                PileMonster.Add(new MutantRats());
+                PileMonster.Add(new BrigandGroup());
+
             }
         }
 
@@ -117,6 +157,28 @@ namespace Jeu_de_Socitété___Izulmha
                 x = Aleatoire.RandomInt(PileSpell.Count);
                 c = PileSpell[x];
                 PileSpell.RemoveAt(x);
+            }
+            else if (name == "Monster")
+            {
+                if (PileSpell.Count == 0)
+                {
+                    foreach (var c2 in DeffausseMonster)
+                    {
+                        PileMonster.Add(c2);
+                    }
+                    DeffausseSpell.Clear();
+                    Console.WriteLine("You fill the Monster Stack. There is {0} cards left. And in the deffause : {1}.", PileMonster.Count, DeffausseMonster.Count);
+                }
+                if (PileMonster.Count == 0)
+                {
+                    Console.WriteLine("There isn't cards in Monster Stack");
+                    return null;
+                }
+
+                x = Aleatoire.RandomInt(PileMonster.Count);
+                c = PileMonster[x];
+                PileSpell.RemoveAt(x);
+                return c;
             }
             Console.Write("You draw a {0}. ", c.Name);
             Console.WriteLine();

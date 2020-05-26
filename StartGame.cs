@@ -29,21 +29,24 @@ namespace Jeu_de_Socitété___Izulmha
             Races.FillRaceList();
 
             //début du jeu
-            Console.WriteLine("Hello challenger ! You enter this fantastique World which is Izulmha. In this World you will embody a character with a Race and a Class. Good Game !");
+            Console.WriteLine("Hello challenger ! You enter this fantastique World : Izulmha. In this World you will embody a character with a Race and a Class. Good Game !");
             int NumberOfPlayer = GameMethod.NumberPlayer();
             for (int i = 0; i < NumberOfPlayer; i++)
             {
                 Console.WriteLine("\nPlayer {0}:\n", i+1);
                 Player p1 = Player.CreatNewRandomPlayer();
                 _listOfPlayer.Add(p1);
+                p1.number = i+1;
 
             }
             for (int i = 0; i < NumberOfPlayer; i++)
             {
-                _listOfPlayer[i].WritePlayerDescritpion();
+                //_listOfPlayer[i].WritePlayerDescritpion();
+                Console.WriteLine("Player {0}:", i + 1);
                 _listOfPlayer[i].WritePlayerStats();
+                Console.WriteLine();
             }
-            C = new Commande(_pilesdeCartes);
+            C = new Commande(_pilesdeCartes, _listOfPlayer);
 
         }
         private void PlayGame()
@@ -55,7 +58,7 @@ namespace Jeu_de_Socitété___Izulmha
 
                 for (int i = 0; i< _listOfPlayer.Count; i++)
                 {
-                    Console.WriteLine(" - Player {0} is playing. - ", i + 1);
+                    Console.WriteLine(" - {0} is playing. - ", _listOfPlayer[i].PlayerName);
                     _listOfPlayer[i].Play(_pilesdeCartes, C);
                     Console.WriteLine(" - Player {0} finished his turn. - \n\n", i + 1);
                 }
@@ -71,14 +74,14 @@ namespace Jeu_de_Socitété___Izulmha
         {
             while(true)
             {
-                Console.WriteLine("How many Challenger want to play ? (min {1} - max {0})", 4, 2);
+                Console.WriteLine("How many Challenger want to play ? (min {1} - max {0})", 6, 2);
                 Console.Write(" --> ");
                 string rep1 = Console.ReadLine();
                 int NumberOfPlayer = 0;
                 try
                 {
                     NumberOfPlayer = Convert.ToInt32(rep1);
-                    if (NumberOfPlayer <= 4 && NumberOfPlayer > 1)
+                    if (NumberOfPlayer <= 6 && NumberOfPlayer >= 2)
                     {
                         return NumberOfPlayer;
                     }
