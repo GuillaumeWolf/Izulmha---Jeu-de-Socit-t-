@@ -14,6 +14,9 @@ namespace Jeu_de_Socitété___Izulmha
         private Player _CurrentPlayer;
         private Commande C;
 
+        //Provisoir
+        public static int numberOfPlayerInThisGame = 0;
+
         static void Main(string[] args)
         {
             var G = new Game();
@@ -31,12 +34,13 @@ namespace Jeu_de_Socitété___Izulmha
             //début du jeu
             Console.WriteLine("Hello challenger ! You enter this fantastique World : Izulmha. In this World you will embody a character with a Race and a Class. Good Game !");
             int NumberOfPlayer = GameMethod.NumberPlayer();
+            numberOfPlayerInThisGame = NumberOfPlayer;
             for (int i = 0; i < NumberOfPlayer; i++)
             {
                 Console.WriteLine("\nPlayer {0}:\n", i+1);
                 Player p1 = Player.CreatNewRandomPlayer();
                 _listOfPlayer.Add(p1);
-                p1.number = i+1;
+                p1.PlayerNumber = i+1;
 
             }
             for (int i = 0; i < NumberOfPlayer; i++)

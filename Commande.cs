@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
@@ -47,6 +48,10 @@ namespace Jeu_de_Socitété___Izulmha
                             choosenPile = "Object";
                         }
                     p1.Cards.DrawCard(_pilesdeCartes, 1, choosenPile);
+                    if(p1.LastStates == Player.PlayerStatsEnum.SellingGivingCard)
+                    {
+                        break;
+                    }
                     p1.PlayerState = Player.PlayerStatsEnum.Drawing;
                     break;
                 }
@@ -64,7 +69,6 @@ namespace Jeu_de_Socitété___Izulmha
                     }
                     if (stilobjet)
                     {
-                        p1.Cards.ShowHandCards();
                         p1.LastStates = p1.PlayerState;
                         p1.PlayerState = Player.PlayerStatsEnum.ChoosingObject;
                         continue;
@@ -258,11 +262,87 @@ namespace Jeu_de_Socitété___Izulmha
                 //Se battre contre un monstre (a faire)
                 if (p1.PlayerState == Player.PlayerStatsEnum.Fighting)
                 {
-                    break;
+                    if (rep == "sc")
+                    {
+                        break;
+                    }
                 }
-                //Vendre des Cartes - Donner des cartes (a faire)
-                if (p1.PlayerState == Player.PlayerStatsEnum.GivingCard)
+                //Vendre des Cartes 
+                if (p1.PlayerState == Player.PlayerStatsEnum.SellingGivingCard)
                 {
+                    Object o1 = null;
+                    bool haspassed = false;
+                    for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                    {
+                        string objectChoosen = "o" + Convert.ToString(i+1);
+                        int gold = 0;
+                        if (p1.Cards.Cards[i] is Object && rep == objectChoosen)
+                        {
+                            o1 = p1.Cards.Cards[i] as Object;
+                            Carte.RarityEnum RO = o1.Rarity;
+                            switch (RO)
+                            {
+                                case Carte.RarityEnum.Common:
+                                    gold = 100;
+                                    break;
+                                case Carte.RarityEnum.Rare:
+                                    gold = 200;
+                                    break;
+                                case Carte.RarityEnum.Mythical:
+                                    gold = 500;
+                                    break;
+                                case Carte.RarityEnum.Legendary:
+                                    gold = 1000;
+                                    break;
+                            }
+                            o1.isBeingSelled = !o1.isBeingSelled;
+                            if (o1.isBeingSelled)
+                            {
+                                p1.SellingGold += gold;
+                            }
+                            else
+                            {
+                                p1.SellingGold -= gold;
+                            }
+                            haspassed = true;
+                            break;
+                        }
+                    }
+                    if(haspassed)
+                    {
+                        continue;
+                    }
+
+                    if (rep == "sell")
+                    {
+                        for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                        {
+                            if (p1.Cards.Cards[i] is Object && (p1.Cards.Cards[i] as Object).isBeingSelled)
+                            {
+                                p1.Cards.Cards.RemoveAt(i);
+                            }
+                        }
+                        p1.LastStates = Player.PlayerStatsEnum.SellingGivingCard;
+                        p1.PlayerState = Player.PlayerStatsEnum.ChoosingPile;
+                        p1.cardToDraw = p1.SellingGold / 500;
+                        Console.WriteLine("You can draw {0} cards.", p1.cardToDraw);
+                        break;
+                    }
+                    else if (rep == "throw")
+                    {
+                        int total = 0;
+                        for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                        {
+                            if (p1.Cards.Cards[i] is Object && (p1.Cards.Cards[i] as Object).isBeingSelled)
+                            {
+                                p1.Cards.Cards.RemoveAt(i);
+                                total++;
+                            }
+                        }
+                        p1.LastStates = Player.PlayerStatsEnum.SellingGivingCard;
+                        Console.WriteLine("You throw {0} cards away.", total);
+                        break;
+                    }
                 }
                 //Voir Les states d'un joueur
                 if(true)
@@ -272,7 +352,7 @@ namespace Jeu_de_Socitété___Izulmha
                     for (int i = 0; i < NumPlayer; i++)
                     {
                         string ChoosenPlayer = "p" + Convert.ToString(i + 1);
-                        if (rep == ChoosenPlayer && i+1 != p1.number)
+                        if (rep == ChoosenPlayer && i+1 != p1.PlayerNumber)
                         {
                             Console.Write("States of ");
                             _listOfPlayer[i].WritePlayerStats();
@@ -286,9 +366,6 @@ namespace Jeu_de_Socitété___Izulmha
                         Console.WriteLine("My States: ");
                         p1.WritePlayerStats();
                         Console.WriteLine();
-                        Console.WriteLine("My Cards: ");
-                        p1.Cards.ShowHandCards();
-                        Console.WriteLine();
                         hasPassed = true;
                     }
                     if(hasPassed)
@@ -296,10 +373,52 @@ namespace Jeu_de_Socitété___Izulmha
                         continue;
                     }
                 }
+                //Voir ses cartes
+                if (true)
+                {
+                    if (rep == "ca")
+                    {
+                        p1.Cards.ShowHandCards();
+                        continue;
+                    }
+                }
+                //Voir la deffausse
+                if (true)
+                {
+                    int dism = _pilesdeCartes.DeffausseMonster.Count;
+                    int diso = _pilesdeCartes.DeffausseObject.Count;
+                    int diss = _pilesdeCartes.DeffausseSpell.Count;
+                    if ((dism != 0 || diso != 0 || diss != 0) && rep == "dis")
+                    {
+                        if (dism > 0)
+                        {
+                            Console.WriteLine("Top of the Monster Discard Stack: {0}", _pilesdeCartes.DeffausseMonster[dism-1].Name);
+                        }
+                        if (diso > 0)
+                        {
+                            Console.WriteLine("Top of the Object Discard Stack: {0}", _pilesdeCartes.DeffausseObject[diso - 1].Name);
+                        }
+                        if (diss > 0)
+                        {
+                            Console.WriteLine("Top of the Spell Discard Stack: {0}", _pilesdeCartes.DeffausseSpell[diss - 1].Name);
+                        }
+                        continue;
+                    }
+                }
                 //Proposer un échange (a faire)
                 //Continue
                 if ((p1.PlayerState == Player.PlayerStatsEnum.PlayingObject || p1.PlayerState == Player.PlayerStatsEnum.ChoosingPets) && rep == "co")
                 {
+                    if (p1.PlayerState == Player.PlayerStatsEnum.SellingGivingCard)
+                    {
+                        for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                        {
+                            if (p1.Cards.Cards[i] is Object)
+                            {
+                                (p1.Cards.Cards[i] as Object).isBeingSelled = false;
+                            }
+                        }
+                    }
                     break;
                 }
                 //Go Back
@@ -313,8 +432,9 @@ namespace Jeu_de_Socitété___Izulmha
                 {
                     if (rep == "aa")
                     {
-                        p1.Cards.Cards.Add(new BasicSword());
-                        Console.WriteLine("You get a Basic Sword. ");
+                        Weapon arme = new TrackingChain();
+                        p1.Cards.Cards.Add(arme);
+                        Console.WriteLine("You get a {0}. ", arme.Name);
                         continue;
                     }
                     if (rep == "bb")
@@ -337,7 +457,7 @@ namespace Jeu_de_Socitété___Izulmha
             Console.WriteLine();
             Console.WriteLine("Here are the posibility: ");
             //Drawing
-            if (p1.PlayerState == Player.PlayerStatsEnum.Drawing )
+            if (p1.PlayerState == Player.PlayerStatsEnum.Drawing)
             {
                 Console.WriteLine(" - You can draw a card. (Draw Card: dc)");
             }
@@ -347,10 +467,10 @@ namespace Jeu_de_Socitété___Izulmha
                 Console.WriteLine(" - You can choose de stack. (Object: o - Spell: s)");
             }
             //Play object
-            if (p1.PlayerState == Player.PlayerStatsEnum.PlayingObject && p1.Cards.Cards.Count != 0 )
+            if (p1.PlayerState == Player.PlayerStatsEnum.PlayingObject && p1.Cards.Cards.Count != 0)
             {
                 bool stilobjet = false;
-                for (int i = 0; i < p1.Cards.Cards.Count; i ++)
+                for (int i = 0; i < p1.Cards.Cards.Count; i++)
                 {
                     if (p1.Cards.Cards[i].PileCarte == "Object" && p1.Cards.Cards[i].Cost <= p1.Mana)
                     {
@@ -370,16 +490,18 @@ namespace Jeu_de_Socitété___Izulmha
             //Choose object
             if (p1.PlayerState == Player.PlayerStatsEnum.ChoosingObject)
             {
+                int objectshow = 0;
                 Console.Write(" - You can choose which Object to play : ( ");
                 for (int i = 0; i < p1.Cards.Cards.Count; i++)
                 {
                     if (p1.Cards.Cards[i].PileCarte == "Object" && p1.Cards.Cards[i].Cost <= p1.Mana)
                     {
-                        if (i != 0)
+                        if (objectshow != 0)
                         {
                             Console.Write(", ");
                         }
-                        Console.Write("c{0}", i + 1);
+                        Console.Write("c{0}: {1}", i + 1, p1.Cards.Cards[i].Name);
+                        objectshow++;
                     }
                 }
                 Console.WriteLine(" )");
@@ -411,13 +533,13 @@ namespace Jeu_de_Socitété___Izulmha
             if (p1.PlayerState == Player.PlayerStatsEnum.ChoosingWeapon)
             {
                 Console.Write(" - You can choose which Weapon to throw: ( ");
-                for (int i =0; i < p1._weaponsPlayed.Count; i++)
+                for (int i = 0; i < p1._weaponsPlayed.Count; i++)
                 {
                     if (i != 0)
                     {
                         Console.Write(", ");
                     }
-                    Console.Write("w{0}: {1}", i+1, p1._weaponsPlayed[i].Name);
+                    Console.Write("w{0}: {1}", i + 1, p1._weaponsPlayed[i].Name);
                 }
                 Console.WriteLine(" )");
             }
@@ -482,39 +604,42 @@ namespace Jeu_de_Socitété___Izulmha
                 {
                     Console.WriteLine(" - You don't have Pets.");
                 }
-                Console.Write(" - You can choose the pets you will use this fight. (write \"pet\" + num)\n     - Not in Fight: ");
-                int notInFightPets = 0;
-                for (int i = 0; i < totalPets; i++)
+                else
                 {
-                    if(!p1._petsPlayed[i].inFight)
+                    Console.Write(" - You can choose the pets you will use this fight. (write \"pet\" + num)\n     - Not in Fight: ");
+                    int notInFightPets = 0;
+                    for (int i = 0; i < totalPets; i++)
                     {
-                        if (notInFightPets != 0)
+                        if (!p1._petsPlayed[i].inFight)
                         {
-                            Console.Write(", ");
+                            if (notInFightPets != 0)
+                            {
+                                Console.Write(", ");
+                            }
+                            notInFightPets++;
+                            Console.Write("pet{0}: {1}", i + 1, p1._petsPlayed[i].Name);
                         }
-                        notInFightPets++;
-                        Console.Write("pet{0}: {1}", i+1, p1._petsPlayed[i].Name);
                     }
-                }
-                Console.WriteLine();
-                Console.Write("     - In Fight: ");
-                int inFightPets = 0;
-                for (int i = 0; i < totalPets; i++)
-                {
-                    if (p1._petsPlayed[i].inFight)
+                    Console.WriteLine();
+                    Console.Write("     - In Fight: ");
+                    int inFightPets = 0;
+                    for (int i = 0; i < totalPets; i++)
                     {
-                        if (inFightPets != 0)
+                        if (p1._petsPlayed[i].inFight)
                         {
-                            Console.Write(", ");
+                            if (inFightPets != 0)
+                            {
+                                Console.Write(", ");
+                            }
+                            inFightPets++;
+                            Console.Write("pet{0}: {1}", i + 1, p1._petsPlayed[i].Name);
                         }
-                        inFightPets++;
-                        Console.Write("pet{0}: {1}", i+1, p1._petsPlayed[i].Name);
                     }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
             }
             //Choisir le type de damage
-            if(p1.PlayerState == Player.PlayerStatsEnum.ChoosingDamage)
+            if (p1.PlayerState == Player.PlayerStatsEnum.ChoosingDamage)
             {
                 Console.WriteLine(" - You can choose what Puissance you will use for the fight. (Strength: s ({0}) - Power: p ({1}))", p1.GetTotalStrength(), p1.GetTotalPower());
             }
@@ -546,15 +671,77 @@ namespace Jeu_de_Socitété___Izulmha
                     }
                 }
             }
-            //Donner des cartes
-            if (p1.PlayerState == Player.PlayerStatsEnum.GivingCard)
+            //Vendre des cartes
+            if (p1.PlayerState == Player.PlayerStatsEnum.SellingGivingCard)
             {
-                Console.WriteLine(" - You can give card. (Give Card: gc)");
+                Console.Write(" - You can choose which Card to sell. ( ");
+                for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                {
+                    int gold = 100;
+                    if (p1.Cards.Cards[i] is Object)
+                    {
+                        Object onparledecetobjet = p1.Cards.Cards[i] as Object;
+                        if (!onparledecetobjet.isBeingSelled)
+                        {
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Rare)
+                            {
+                                gold = 200;
+                            }
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Mythical)
+                            {
+                                gold = 500;
+                            }
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Legendary)
+                            {
+                                gold = 1000;
+                            }
+                            Console.Write("o{0}: {1} {2} gold. ", i + 1, p1.Cards.Cards[i].Name, gold);
+                        }
+                    }
+                }
+                Console.WriteLine(")");
+
+                Console.Write(" - You can choose which Card to not sell. (");
+                for (int i = 0; i < p1.Cards.Cards.Count; i++)
+                {
+                    int gold = 100;
+                    if (p1.Cards.Cards[i] is Object)
+                    {
+                        Object onparledecetobjet = p1.Cards.Cards[i] as Object;
+                        if (onparledecetobjet.isBeingSelled)
+                        {
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Rare)
+                            {
+                                gold = 200;
+                            }
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Mythical)
+                            {
+                                gold = 500;
+                            }
+                            if (p1.Cards.Cards[i].Rarity == Carte.RarityEnum.Legendary)
+                            {
+                                gold = 1000;
+                            }
+                            Console.Write("o{0}: {1} {2} gold. ", i + 1, p1.Cards.Cards[i].Name, gold);
+                        }
+                    }
+                }
+                Console.WriteLine(")");
+
+                if (p1.SellingGold >= 500)
+                {
+                    int numcard = p1.SellingGold / 500;
+                    Console.WriteLine(" - You can sell the choosen Object to draw {0} Cards. (sell) ", numcard);
+                }
+                else
+                {
+                    Console.WriteLine(" - You can throw the choosen Object away. (throw)");
+                }
             }
             //Regarder les states d'un joueur
-            if(true)
+            if (true)
             {
-                Console.Write(" - You can see the State of a player: ( ");
+                Console.Write(" - You can see the State of a player. ( ");
                 int playerLong = _listOfPlayer.Count;
                 for (int i = 0; i < playerLong; i++)
                 {
@@ -562,7 +749,7 @@ namespace Jeu_de_Socitété___Izulmha
                     {
                         Console.Write(", ");
                     }
-                    if (i + 1 == p1.number)
+                    if (i + 1 == p1.PlayerNumber)
                     {
                         Console.Write("me");
                         continue;
@@ -571,6 +758,60 @@ namespace Jeu_de_Socitété___Izulmha
                 }
                 Console.WriteLine(" )");
             }
+            //Regarder ses cartes
+            if (true)
+            {
+                Console.Write(" - You can see your cards. ( cards: ca ) ");
+                Console.WriteLine();
+            }
+            //Voir la deffause
+            if (true)
+            {
+                if (_pilesdeCartes.DeffausseMonster.Count != 0 || _pilesdeCartes.DeffausseSpell.Count != 0 || _pilesdeCartes.DeffausseObject.Count != 0)
+                {
+                    string? isdeffMonster = "";
+                    if (_pilesdeCartes.DeffausseMonster.Count != 0)
+                    {
+                        isdeffMonster = "Montser";
+                    }
+                    string? isdeffObject = "";
+                    if (_pilesdeCartes.DeffausseObject.Count != 0)
+                    {
+                        isdeffObject = "Object";
+                    }
+                    string? isdeffSpell = "";
+                    if (_pilesdeCartes.DeffausseSpell.Count != 0)
+                    {
+                        isdeffSpell = "Spell";
+                    }
+                    if (isdeffSpell != "" || isdeffObject != "" || isdeffMonster != "")
+                    {
+                        Console.Write(" - You can see the top of the ");
+                        if (isdeffMonster != "")
+                        {
+                            Console.Write(isdeffMonster);
+                        }
+                        if (isdeffObject != "")
+                        {
+                            if (isdeffMonster != "")
+                            {
+                                Console.Write(", ");
+                            }
+                            Console.Write(isdeffObject);
+                        }
+                        if (isdeffSpell != "")
+                        {
+                            if (isdeffObject != "")
+                            {
+                                Console.Write(", ");
+                            }
+                            Console.Write(isdeffSpell);
+                        }
+                        Console.Write(" Discard Stack. ( discard: dis ) ");
+                    }
+                    Console.WriteLine();
+                }
+            }
             //Continue
             if (p1.PlayerState == Player.PlayerStatsEnum.PlayingObject || p1.PlayerState == Player.PlayerStatsEnum.ChoosingPets)
             {
@@ -578,10 +819,9 @@ namespace Jeu_de_Socitété___Izulmha
             }
             //Go back
             if (p1.PlayerState == Player.PlayerStatsEnum.ChoosingObject || p1.PlayerState == Player.PlayerStatsEnum.ChoosingSpell || p1.PlayerState == Player.PlayerStatsEnum.ChoosingWeapon)
-            {
-                Console.WriteLine(" - Go back: gb. ");
-            }
+                {
+                    Console.WriteLine(" - Go back: gb. ");
+                }
         }
-
     }
 }

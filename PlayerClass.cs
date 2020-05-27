@@ -30,7 +30,6 @@ namespace Jeu_de_Socitété___Izulmha
             Name = "Priest";
         }
     }
-
     class Sorcier : Classes
     {
         public Sorcier()

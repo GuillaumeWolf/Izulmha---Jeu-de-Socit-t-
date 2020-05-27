@@ -13,11 +13,13 @@ namespace Jeu_de_Socitété___Izulmha
         //Name/class/race
         public string PlayerName;
         public Classes PlayerClass;
+        public int ClassLevel = 1;
         public Races PlayerRace;
-        public int number;
+        public int RaceLevel = 1;
+        public int PlayerNumber;
         //Stats
             //Vie
-        public int BasicHP = 10;
+        public int BasicHP = 8;
         public int HP;
             //Physique
         public int BasicStrength = 1;
@@ -26,8 +28,9 @@ namespace Jeu_de_Socitété___Izulmha
         public int BasicPower = 1;
         public int Power;
             //Mana
-        public int ManaGemme = 3;
+        public int ManaGemme = 2;
         public int Mana;
+
         //Objets
         public int MaxHands = 2;
         public List<Weapon> _weaponsPlayed = new List<Weapon>();
@@ -39,6 +42,11 @@ namespace Jeu_de_Socitété___Izulmha
 
         // Cartes
         public PlayerHand Cards = new PlayerHand();
+        public int maxCardInHand = 10;
+
+        //Vente
+        public int SellingGold = 0;
+        public int cardToDraw = 0;
 
         //Etat
         public enum PlayerStatsEnum 
@@ -59,20 +67,21 @@ namespace Jeu_de_Socitété___Izulmha
             //3
             ChoosingPets,
             ChoosingDamage,
-            Fighting, 
+            Fighting,
             //4
-            GivingCard,
+            SellingGivingCard,
             //Autre
             ChoosingPlayer
         }
         public PlayerStatsEnum PlayerState;
         public PlayerStatsEnum LastStates;
 
-        #endregion
-
         //Fight
         public bool FightWithStrength = true;
         public NormalMonster FightMonster = null;
+
+        #endregion public properties
+
 
         public Player(string nameInput, Classes classofplayer, Races raceofplayer)
         {
@@ -151,6 +160,7 @@ namespace Jeu_de_Socitété___Izulmha
             PlayerState = PlayerStatsEnum.PlayingObject;
             C.AllCommande(this);
 
+
             //3
             Console.Write("\n3. Fight a random Monster. ");
             Monster m1 =  Cards.DrawMonster(pilesdeCartes);
@@ -166,13 +176,33 @@ namespace Jeu_de_Socitété___Izulmha
             Console.Write("You are facing ", FightMonster.Name);
             FightMonster.ShowCard();
 
-            PlayerState = PlayerStatsEnum.ChoosingPets;
-            C.AllCommande(this); 
             PlayerState = PlayerStatsEnum.ChoosingDamage;
+            C.AllCommande(this); 
+            PlayerState = PlayerStatsEnum.ChoosingPets;
             C.AllCommande(this);
             PlayerState = PlayerStatsEnum.Fighting;
             C.AllCommande(this);
 
+
+            //4
+            Console.Write("\n4. Selling Object (per 500 gold draw a Card).");
+            while (Cards.Cards.Count > maxCardInHand)
+            {
+                PlayerState = PlayerStatsEnum.SellingGivingCard;
+                C.AllCommande(this);
+                if(Cards.Cards.Count > maxCardInHand)
+                {
+                    Console.WriteLine("You have to much Cards. Sell them, or throw some.");
+                }
+            }
+            while(cardToDraw > 0)
+            {
+                C.AllCommande(this);
+                cardToDraw--;
+            }
+
+            //5
+            PlayerState = PlayerStatsEnum.NotIsTurn;
 
         }
 
@@ -197,14 +227,6 @@ namespace Jeu_de_Socitété___Izulmha
                 int longWeapon = _weaponsPlayed.Count;
                 for (int i = 0; i < longWeapon; i++)
                 {
-                    if (_weaponsPlayed[i].Strength.HasValue)
-                    {
-                        totalStrength += _weaponsPlayed[i].Strength;
-                    }
-                    if (_weaponsPlayed[i].Power.HasValue)
-                    {
-                        totalPower += _weaponsPlayed[i].Power;
-                    }
                     if (_weaponsPlayed[i].Mana.HasValue)
                     {
                         totalMana += _weaponsPlayed[i].Mana;
@@ -216,14 +238,6 @@ namespace Jeu_de_Socitété___Izulmha
 
                 if (_armorPlayed != null)
                 {
-                    if (_armorPlayed.Strength.HasValue)
-                    {
-                        totalStrength += _armorPlayed.Strength;
-                    }
-                    if (_armorPlayed.Power.HasValue)
-                    {
-                        totalPower += _armorPlayed.Power;
-                    }
                     if (_armorPlayed.Mana.HasValue)
                     {
                         totalMana += _armorPlayed.Mana;
@@ -235,14 +249,6 @@ namespace Jeu_de_Socitété___Izulmha
 
                 if (_helmetPlayed != null)
                 {
-                    if (_helmetPlayed.Strength.HasValue)
-                    {
-                        totalStrength += _helmetPlayed.Strength;
-                    }
-                    if (_helmetPlayed.Power.HasValue)
-                    {
-                        totalPower += _helmetPlayed.Power;
-                    }
                     if (_helmetPlayed.Mana.HasValue)
                     {
                         totalMana += _helmetPlayed.Mana;
@@ -255,14 +261,6 @@ namespace Jeu_de_Socitété___Izulmha
                 int longAmulette = _amulettePlayed.Count;
                 for (int i = 0; i < longAmulette; i++)
                 {
-                    if (_amulettePlayed[i].Strength.HasValue)
-                    {
-                        totalStrength += _amulettePlayed[i].Strength;
-                    }
-                    if (_amulettePlayed[i].Power.HasValue)
-                    {
-                        totalPower += _amulettePlayed[i].Power;
-                    }
                     if (_amulettePlayed[i].Mana.HasValue)
                     {
                         totalMana += _amulettePlayed[i].Mana;
@@ -275,7 +273,6 @@ namespace Jeu_de_Socitété___Izulmha
                 int longPets = _petsPlayed.Count;
                 for (int i = 0; i < longPets; i++)
                 {
-                    //totalStrength += _petsPlayed[i].Puissance;
                     if (_petsPlayed[i].Mana.HasValue)
                     {
                         totalMana += _petsPlayed[i].Mana;
@@ -286,126 +283,17 @@ namespace Jeu_de_Socitété___Izulmha
                 if (longPets == 0) { Console.Write("No Pets. "); }
 
                 Console.WriteLine();
-                Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}/{3}.", totalStrength, totalPower, totalMana, totalManaGemme);
-            }
-            else 
-            {
-                Console.Write("{0} the {1} {2}:", PlayerName, PlayerClass.Name, PlayerRace.Name);
-                if (FightWithStrength)
+                if (PlayerState != PlayerStatsEnum.Fighting)
                 {
-                    int? totalStrength = Strength;
-                    int longWeapon = _weaponsPlayed.Count;
-                    for (int i = 0; i < longWeapon; i++)
-                    {
-                        if (_weaponsPlayed[i].Strength.HasValue)
-                        {
-                            totalStrength += _weaponsPlayed[i].Strength;
-                        }
-                        Console.Write("Weapon {0}: {1}. ", i + 1, _weaponsPlayed[i].Name);
-                    }
-                    if (longWeapon == 0) { Console.Write("No Weapons. "); }
-
-                    if (_armorPlayed != null)
-                    {
-                        if (_armorPlayed.Strength.HasValue)
-                        {
-                            totalStrength += _armorPlayed.Strength;
-                        }
-                        Console.Write("Armor: {0}. ", _armorPlayed.Name);
-                    }
-                    else { Console.Write("No Armor. "); }
-
-                    if (_helmetPlayed != null)
-                    {
-                        if (_helmetPlayed.Strength.HasValue)
-                        {
-                            totalStrength += _helmetPlayed.Strength;
-                        }
-                        Console.Write("Helmet: {0}. ", _helmetPlayed.Name);
-                    }
-                    else { Console.Write("No Helmet. "); }
-
-                    int longAmulette = _amulettePlayed.Count;
-                    for (int i = 0; i < longAmulette; i++)
-                    {
-                        if (_amulettePlayed[i].Strength.HasValue)
-                        {
-                            totalStrength += _amulettePlayed[i].Strength;
-                        }
-                        Console.Write("Amulette {0}: {1}. ", i + 1, _amulettePlayed[i].Name);
-                    }
-                    if (longAmulette == 0) { Console.Write("No Amulette. "); }
-
-                    int longPets = _petsPlayed.Count;
-                    for (int i = 0; i < longPets; i++)
-                    {
-                        if (_petsPlayed[i].inFight)
-                        {
-                            totalStrength += _petsPlayed[i].Puissance;
-                        }
-                        Console.Write("Pets {0}: {1}. ", i + 1, _petsPlayed[i].Name);
-                    }
-                    if (longPets == 0) { Console.Write("No Pets. "); }
-                    Console.WriteLine();
-                    Console.WriteLine("Total Puissance: {0}", totalStrength);
+                    Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}/{3}.", GetTotalPower(), GetTotalPower(), totalMana, totalManaGemme);
+                }
+                else if (FightWithStrength)
+                {
+                    Console.WriteLine("Puissance: {0}.", GetTotalPower());
                 }
                 else
                 {
-                    int? totalStrength = Power;
-                    int longWeapon = _weaponsPlayed.Count;
-                    for (int i = 0; i < longWeapon; i++)
-                    {
-                        if (_weaponsPlayed[i].Power.HasValue)
-                        {
-                            totalStrength += _weaponsPlayed[i].Power;
-                        }
-                        Console.Write("Weapon {0}: {1}. ", i + 1, _weaponsPlayed[i].Name);
-                    }
-                    if (longWeapon == 0) { Console.Write("No Weapons. "); }
-
-                    if (_armorPlayed != null)
-                    {
-                        if (_armorPlayed.Power.HasValue)
-                        {
-                            totalStrength += _armorPlayed.Power;
-                        }
-                        Console.Write("Armor: {0}. ", _armorPlayed.Name);
-                    }
-                    else { Console.Write("No Armor. "); }
-
-                    if (_helmetPlayed != null)
-                    {
-                        if (_helmetPlayed.Power.HasValue)
-                        {
-                            totalStrength += _helmetPlayed.Power;
-                        }
-                        Console.Write("Helmet: {0}. ", _helmetPlayed.Name);
-                    }
-                    else { Console.Write("No Helmet. "); }
-
-                    int longAmulette = _amulettePlayed.Count;
-                    for (int i = 0; i < longAmulette; i++)
-                    {
-                        if (_amulettePlayed[i].Power.HasValue)
-                        {
-                            totalStrength += _amulettePlayed[i].Power;
-                        }
-                        Console.Write("Amulette {0}: {1}. ", i + 1, _amulettePlayed[i].Name);
-                    }
-                    if (longAmulette == 0) { Console.Write("No Amulette. "); }
-
-                    int longPets = _petsPlayed.Count;
-                    for (int i = 0; i < longPets; i++)
-                    {
-                        if (_petsPlayed[i].inFight)
-                        {
-                            totalStrength += _petsPlayed[i].Puissance;
-                        }
-                        Console.Write("Pets {0}: {1}. ", i + 1, _petsPlayed[i].Name);
-                    }
-                    if (longPets == 0) { Console.Write("No Pets. "); }
-                    Console.WriteLine();
-                    Console.WriteLine("Total Puissance: {0}", totalStrength);
+                    Console.WriteLine("Puissance: {0}.", GetTotalPower());
                 }
             }
         }
@@ -452,6 +340,10 @@ namespace Jeu_de_Socitété___Izulmha
                 if (_petsPlayed[i].inFight)
                 {
                     totalStrength += _petsPlayed[i].Puissance;
+                }
+                if (_petsPlayed[i] is TotemOfStrength)
+                {
+                    totalStrength += (_petsPlayed[i] as TotemOfStrength).GivePlayerStrength();
                 }
             }
             return totalStrength;

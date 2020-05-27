@@ -28,23 +28,30 @@ namespace Jeu_de_Socitété___Izulmha
             for (int i = 0; i < 2; i++)
             {
                 //Common
+                    //Weapon
                 PileObject.Add(new DoubleSword());
                 PileObject.Add(new MagicGauntlet());
                 //Rare
-                PileObject.Add(new LongSword());
+                    //Weapon
+                PileObject.Add(new VikingSword());
                 PileObject.Add(new BigMagicOrb());
                 PileObject.Add(new BigSpear());
                 PileObject.Add(new DoubleManaSword());
-                PileObject.Add(new IronShield());
+                PileObject.Add(new VikingShield());
                 PileObject.Add(new GiantShield());
+                    //Armor
                 PileObject.Add(new ReinforcedChestplate());
                 PileObject.Add(new MagicArmor());
+                    //Helmet
                 PileObject.Add(new VikingHelmet());
                 PileObject.Add(new IronHat());
+                    //Shoes
                 PileObject.Add(new SpeedShoes());
                 PileObject.Add(new ArmedShoes());
+                    //Amulette
                 PileObject.Add(new WitchBracelet());
                 PileObject.Add(new LeaderCape());
+                    //Pets
                 PileObject.Add(new WolfPack());
                 PileObject.Add(new WildParrot());
                 PileObject.Add(new Reel());
@@ -53,7 +60,7 @@ namespace Jeu_de_Socitété___Izulmha
             for (int i = 0; i < 3; i++)
             {
                 //Common
-                PileObject.Add(new BasicSword());
+                PileObject.Add(new GreekSword());
                 PileObject.Add(new MagicOrb());
                 PileObject.Add(new SmallShield());
                 PileObject.Add(new MagicShield());
@@ -108,6 +115,7 @@ namespace Jeu_de_Socitété___Izulmha
                 PileMonster.Add(new MutantRats());
                 PileMonster.Add(new BrigandGroup());
 
+                DeffausseMonster.Add(new GreatSandScorpion());
             }
         }
 
