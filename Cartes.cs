@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
@@ -62,14 +63,39 @@ namespace Jeu_de_Socitété___Izulmha
         {
 
         }
+        public override void ShowCard()
+        {
+            base.ShowCard();
+            if(specialCardTypeEnum != SpecialCardTypeEnum.Nothing)
+            {
+                Console.Write("Special Type: {0}.", specialCardTypeEnum);
+            }
+        }
     }
     abstract class Spell : Carte
     {
+        public List<String> StringListPossibleValues = new List<string>();
+        public List<Object> ObjectListPossibleValues = new List<Object>();
+        public List<Player> PlayerListPossibleValue = new List<Player>();
+
         protected Spell(string categorie, string name, RarityEnum rarity) : base("Spell", categorie, name, rarity)
         {
 
         }
 
+        public virtual PlayCardResult CheckCanPlay(List<Player> lp1)
+        {
+            PlayCardResult result = PlayCardResult.OK;
+            return result;
+        }
+        public virtual void CastSpell()
+        {
+
+        }
+        public virtual void WritePoss()
+        {
+
+        }
     }
     abstract class Monster : Carte
     {
@@ -94,7 +120,7 @@ namespace Jeu_de_Socitété___Izulmha
         //Place
         public int HandTake = 1;
         //Property
-        public string? Utilities;
+        public string Utilities;
         protected Weapon(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Weapon", name, rarity, specialCardTypeEnum)
         {
 
@@ -102,6 +128,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             if (Strength.HasValue)
             {
                 Console.Write("Strength: {0}. ", Strength.Value);
@@ -115,6 +142,10 @@ namespace Jeu_de_Socitété___Izulmha
                 Console.Write("Mana: {0}. ", Mana.Value);
             }
             Console.Write("Take {0} hand. ", HandTake);
+            if(Utilities != null)
+            {
+                Console.Write("Utilities: {0} ", Utilities);
+            }
         }
     }
 
@@ -126,7 +157,7 @@ namespace Jeu_de_Socitété___Izulmha
         //Mana
         public int? Mana;
         //Property
-        public string? Utilities;
+        public string Utilities;
         protected Armor(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Armor", name, rarity, specialCardTypeEnum)
         {
 
@@ -134,6 +165,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             if (Strength.HasValue)
             {
                 Console.Write("Strength: {0}. ", Strength.Value);
@@ -145,6 +177,10 @@ namespace Jeu_de_Socitété___Izulmha
             if (Mana.HasValue)
             {
                 Console.Write("Mana: {0}. ", Mana.Value);
+            }
+            if (Utilities != null)
+            {
+                Console.Write("Utilities: {0}", Utilities);
             }
         }
 
@@ -158,7 +194,7 @@ namespace Jeu_de_Socitété___Izulmha
         //Mana
         public int? Mana;
         //Property
-        public string? Utilities;
+        public string Utilities;
         protected Helmet(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Helmet", name, rarity, specialCardTypeEnum)
         {
 
@@ -166,6 +202,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             if (Strength.HasValue)
             {
                 Console.Write("Strength: {0}. ", Strength.Value);
@@ -177,6 +214,10 @@ namespace Jeu_de_Socitété___Izulmha
             if (Mana.HasValue)
             {
                 Console.Write("Mana: {0}. ", Mana.Value);
+            }
+            if (Utilities != null)
+            {
+                Console.Write("Utilities: {0} ", Utilities);
             }
         }
 
@@ -190,7 +231,7 @@ namespace Jeu_de_Socitété___Izulmha
         //Mana
         public int? Mana;
         //Property
-        public string? Utilities;
+        public string Utilities;
         protected Shoe(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Shoe", name, rarity, specialCardTypeEnum)
         {
 
@@ -198,6 +239,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             if (Strength.HasValue)
             {
                 Console.Write("Strength: {0}. ", Strength.Value);
@@ -209,6 +251,10 @@ namespace Jeu_de_Socitété___Izulmha
             if (Mana.HasValue)
             {
                 Console.Write("Mana: {0}. ", Mana.Value);
+            }
+            if (Utilities != null)
+            {
+                Console.Write("Utilities: {0} ", Utilities);
             }
         }
 
@@ -222,14 +268,15 @@ namespace Jeu_de_Socitété___Izulmha
         //Mana
         public int? Mana;
         //Property
-        public string? Utilities;
-        protected Amulette(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Helmet", name, rarity, specialCardTypeEnum)
+        public string Utilities;
+        protected Amulette(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Amulette", name, rarity, specialCardTypeEnum)
         {
 
         }
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             if (Strength.HasValue)
             {
                 Console.Write("Strength: {0}. ", Strength.Value);
@@ -242,6 +289,10 @@ namespace Jeu_de_Socitété___Izulmha
             {
                 Console.Write("Mana: {0}. ", Mana.Value);
             }
+            if (Utilities != null)
+            {
+                Console.Write("Utilities: {0} ", Utilities);
+            }
         }
     }
 
@@ -253,9 +304,11 @@ namespace Jeu_de_Socitété___Izulmha
         //Mana
         public int? Mana;
         //Property
-        public string Utilities = "";
+        public string Utilities;
         //InFight
         public bool inFight = false;
+        //Dead
+        public bool isDead = false;
 
         protected Pets(string name, RarityEnum rarity, SpecialCardTypeEnum specialCardTypeEnum) : base("Pets", name, rarity, specialCardTypeEnum)
         {
@@ -264,15 +317,25 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
-            Console.Write("Strength: {0}. ", Puissance);
+            Console.WriteLine();
+            Console.Write("Puissance: {0}. ", Puissance);
+            Console.Write("HP: {0}. ", HP);
             if (Mana.HasValue)
             {
                 Console.Write("Mana: {0}. ", Mana.Value);
             }
-            if (Utilities != "")
+            if (Utilities != null)
             {
-                Console.Write("Property; {0}. ", Utilities);
+                Console.Write("Property: {0}", Utilities);
             }
+        }
+        public void EndOfAFight()
+        {
+            if ( inFight)
+            {
+                HP -= 1;
+            }
+            inFight = false;
         }
 
     }
@@ -281,7 +344,7 @@ namespace Jeu_de_Socitété___Izulmha
     #region Spell
     abstract class Incantation : Spell
     {
-        public string? properties1;
+        public string Utility;
 
         protected Incantation(string name, RarityEnum rarity) : base("Incantation", name, rarity)
         {
@@ -290,12 +353,12 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
-            Console.Write("Power: {0}", properties1);
+            Console.Write("Utility: {0}", Utility);
         }
     }
     abstract class Flask : Spell
     {
-        public string? properties1;
+        public string Utility;
 
         protected Flask(string name, RarityEnum rarity) : base("Flask", name, rarity)
         {
@@ -304,7 +367,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
-            Console.Write("Effect: {0}", properties1);
+            Console.Write("Utility: {0}", Utility);
         }
     }
     #endregion Spell
@@ -324,6 +387,7 @@ namespace Jeu_de_Socitété___Izulmha
         public override void ShowCard()
         {
             base.ShowCard();
+            Console.WriteLine();
             Console.Write("Puissance: {0}. ", Puissance);
             Console.Write("Drop Card: {0}. ", NumDropCards);
             if (Property != "")
@@ -351,7 +415,7 @@ namespace Jeu_de_Socitété___Izulmha
     //Armes
     class GreekSword : Weapon
     {
-        public GreekSword() : base("Basic Sword", RarityEnum.Common, SpecialCardTypeEnum.Greek)
+        public GreekSword() : base("Greek Sword", RarityEnum.Common, SpecialCardTypeEnum.Greek)
         {
             Strength = 1;
             Power = 1;
@@ -558,56 +622,100 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public AntiWeaponSpell() : base("Anti-Weapon Spell", RarityEnum.Common)
         {
-            properties1 = "Destroy a Common Weapon. ";
+            Utility = "Destroy a Common Weapon. ";
+
+        }
+        public override PlayCardResult CheckCanPlay(List<Player> lp1)
+        {
+            PlayCardResult result = PlayCardResult.CantCastSpell;
+            int countweapon = 1;
+            for (int i = 0; i < lp1.Count; i++)
+            {
+                for (int j = 0; j < lp1[i]._weaponsPlayed.Count; j++)
+                {
+                    if (lp1[i]._weaponsPlayed[j].Rarity == RarityEnum.Common)
+                    {
+                        result = PlayCardResult.OK;
+                        string weaponsss = "w" + Convert.ToString(countweapon);
+                        StringListPossibleValues.Add(weaponsss);
+                        ObjectListPossibleValues.Add(lp1[i]._weaponsPlayed[j]);
+                        PlayerListPossibleValue.Add(lp1[i]);
+                    }
+                }
+            }
+            return result;
+        }
+        public override void CastSpell()
+        {
+            while (true)
+            {
+                Console.WriteLine("Choose the weapon to destroy. ");
+                WritePoss();
+                Console.Write(" --> ");
+                string rep = Console.ReadLine();
+                if (StringListPossibleValues.Contains(rep))
+                {
+                    int indexx = StringListPossibleValues.IndexOf(rep);
+                    Console.WriteLine("You destroy the {0} of {1}. ", ObjectListPossibleValues[indexx].Name, PlayerListPossibleValue[indexx].PlayerName);
+                    PlayerListPossibleValue[indexx].Cards.Cards.Remove(ObjectListPossibleValues[indexx]);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Choose a correct target. ");
+                }
+            }
+        }
+
+        public override void WritePoss()
+        {
+            for (int i = 0; i < StringListPossibleValues.Count; i++)
+            {
+                Console.WriteLine(" - {0}: {1} of {2}", StringListPossibleValues[i], ObjectListPossibleValues[i].Name, PlayerListPossibleValue[i].PlayerName);
+            }
         }
     }
     class AntiArmorSpell : Incantation
     {
         public AntiArmorSpell() : base("Anti-Armor Spell", RarityEnum.Common)
         {
-            properties1 = "Destroy a Common Armor. ";
+            Utility = "Destroy a Common Armor. ";
         }
     }
     class AntiHelmetSpell : Incantation
     {
         public AntiHelmetSpell() : base("Anti-Helmet Spell", RarityEnum.Common)
         {
-            properties1 = "Destroy a Common Helmet. ";
+            Utility = "Destroy a Common Helmet. ";
         }
     }
     class AntiAmuletteSpell : Incantation
     {
         public AntiAmuletteSpell() : base("Anti-Amulette Spell", RarityEnum.Common)
         {
-            properties1 = "Destroy a Common Amulette. ";
+            Utility = "Destroy a Common Amulette. ";
         }
     }
     class DamagePetsSpell : Incantation
     {
         public DamagePetsSpell() : base("Damage Pets Spell", RarityEnum.Common)
         {
-            properties1 = "-1 Hp to a Pets. ";
+            Utility = "Deal 1 Damage to a Pets. ";
         }
     }
     class AmuletteRobbery : Incantation
     {
         public AmuletteRobbery() : base("Amulette Robbery", RarityEnum.Common)
         {
-            properties1 = "Steal Common Amulette. ";
+            Utility = "Steal Common Amulette. ";
         }
     }
-    class CounterSpell : Incantation
-    {
-        public CounterSpell() : base("Counter Spell ", RarityEnum.Common)
-        {
-            properties1 = "Counter a Common Invocation. ";
-        }
-    }
+
     class MonsterBoostCommon : Incantation
     {
         public MonsterBoostCommon() : base("Monster Boost ", RarityEnum.Common)
         {
-            properties1 = "Give +3 to a Monster. ";
+            Utility = "Give +3 to a Monster. ";
         }
     }
     #endregion Incantation
@@ -617,28 +725,28 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public StrengthFlask() : base("Strength Flask", RarityEnum.Common)
         {
-            properties1 = "+1 Strength for this fight.";
+            Utility = "+1 Strength for this fight.";
         }
     }
     class PowerFlask : Flask
     {
         public PowerFlask() : base("Power Flask", RarityEnum.Common)
         {
-            properties1 = "+1 Power for this fight.";
+            Utility = "+1 Power for this fight.";
         }
     }
     class ManaFlask : Flask
     {
         public ManaFlask() : base("Mana Flask", RarityEnum.Common)
         {
-            properties1 = "+1 Mana for this turn.";
+            Utility = "+1 Mana for this turn.";
         }
     }
     class HealFlask : Flask
     {
         public HealFlask() : base("Heal Flask", RarityEnum.Common)
         {
-            properties1 = "Heal 2 HP.";
+            Utility = "Heal 2 HP.";
         }
     }
     #endregion Flask
@@ -1229,13 +1337,64 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public TrackingChain() : base("Tracking Chain", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
         {
-            //Dégats 
             Strength = 6;
             Utilities = "Tracker: ";
         }
     }
-
+    class ArthurLegendarySword : Weapon
+    {
+        public ArthurLegendarySword() : base("TArthur Legendary Sword", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
+        {
+            Strength = 6;
+            Utilities = "(Knight: When Summoned: You can replace your Armor, Helmet, Shoes, by every same Object in the discard";
+        }
+    }
     #endregion Weapon
+
+    #region Armor
+    class Exoskeleton : Armor
+    {
+        public Exoskeleton() : base("Exoskeleton", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
+        {
+            Utilities = "Give you 2 hand Spot. Archer: When Summoned: Take the two first 1 hand Shield or the first 2 hands Shield from the Discard and summon it/them";
+        }
+    }
+    
+    #endregion Armor
+
+    #region Helmet
+    class HatofManipulation : Helmet
+    {
+        public HatofManipulation() : base("Hat of Manipulation", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
+        {
+            Utilities = " When summoned, Summon 2 Pets from your hand (Priest: summon 5 Followers) ";
+        }
+    }
+    #endregion Helmet
+
+    #region Shoe
+    
+
+    #endregion Shoe
+
+    #region Amulette
+    class GhostlySaddle : Amulette
+    {
+        public GhostlySaddle() : base("Ghostly Saddle", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
+        {
+            Utilities = "When Summoned: Choose a Pets, you give the Ghostly Saddle to it. Now he can’t die in fight. (Trainer: When Summoned: Summon a Legendary Pets and give the Ghostly Saddle to it)";
+        }
+    }
+    class SpellHole : Amulette
+    {
+        public SpellHole() : base("Spell Hole", RarityEnum.Legendary, SpecialCardTypeEnum.Nothing)
+        {
+            Mana = 5;
+            Utilities = "Sorcer: Passive: Each time you play an Object, draw a spell.";
+        }
+    }
+
+    #endregion Amulette
 
     //Monster
     #region Normal Monster
@@ -1265,11 +1424,13 @@ namespace Jeu_de_Socitété___Izulmha
         {
             Puissance = 2;
             HP = 1;
+            inFight = true;
         }
     }
     #endregion Priest
 
     #region Archer
+    //Arc
     class CommonBow : Weapon
     {
         public CommonBow() : base("Common Bow", RarityEnum.ClassMemberShip, SpecialCardTypeEnum.Nothing)
@@ -1298,6 +1459,8 @@ namespace Jeu_de_Socitété___Izulmha
             HandTake = 2;
         }
     }
+
+    //Arbalette
     class CommonCrossBow : Weapon
     {
         public CommonCrossBow() : base("Common CrossBow", RarityEnum.ClassMemberShip, SpecialCardTypeEnum.Nothing)
@@ -1326,6 +1489,7 @@ namespace Jeu_de_Socitété___Izulmha
             HandTake = 2;
         }
     }
+
     #endregion Archer
 
     #region Trainer

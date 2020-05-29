@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Text.Json;
 
 namespace Jeu_de_Socitété___Izulmha
 {
@@ -20,17 +22,40 @@ namespace Jeu_de_Socitété___Izulmha
             //Objet
             for (int i = 0; i < 1; i++)
             {
-                //Mythical
-
                 //Legendary
+                PileObject.Add(new TrackingChain());
+                PileObject.Add(new ArthurLegendarySword());
+                PileObject.Add(new Exoskeleton());
+                PileObject.Add(new HatofManipulation());
+                PileObject.Add(new GhostlySaddle());
+                PileObject.Add(new SpellHole());
 
             }
             for (int i = 0; i < 2; i++)
             {
                 //Common
                     //Weapon
+                PileObject.Add(new GreekSword());
+                PileObject.Add(new SimpleDagger());
+                PileObject.Add(new BewitchedAx());
+                PileObject.Add(new MagicOrb());
                 PileObject.Add(new DoubleSword());
                 PileObject.Add(new MagicGauntlet());
+                PileObject.Add(new GreekShield());
+                PileObject.Add(new SmallShield());
+                PileObject.Add(new MagicShield());
+                    //Armor
+                PileObject.Add(new GreekArmor());
+                PileObject.Add(new MagicChestplate());
+                PileObject.Add(new Chestplate());
+                    //Helemt
+                PileObject.Add(new GreekHelmet());
+                PileObject.Add(new BasicHelmet());
+                PileObject.Add(new MagicHelmet());
+                    //Shoe
+                PileObject.Add(new GreekShoes());
+                PileObject.Add(new NormalShoes());
+
                 //Rare
                     //Weapon
                 PileObject.Add(new VikingSword());
@@ -40,37 +65,56 @@ namespace Jeu_de_Socitété___Izulmha
                 PileObject.Add(new VikingShield());
                 PileObject.Add(new GiantShield());
                     //Armor
+                PileObject.Add(new VikingArmor());
                 PileObject.Add(new ReinforcedChestplate());
                 PileObject.Add(new MagicArmor());
                     //Helmet
                 PileObject.Add(new VikingHelmet());
                 PileObject.Add(new IronHat());
                     //Shoes
+                PileObject.Add(new VikingShoes());
                 PileObject.Add(new SpeedShoes());
                 PileObject.Add(new ArmedShoes());
                     //Amulette
                 PileObject.Add(new WitchBracelet());
                 PileObject.Add(new LeaderCape());
                     //Pets
+                PileObject.Add(new VikingBear());
                 PileObject.Add(new WolfPack());
                 PileObject.Add(new WildParrot());
                 PileObject.Add(new Reel());
 
+                //Mythical
+                    //Weapon
+                PileObject.Add(new KnifeInMithril());
+                PileObject.Add(new GodKillerSword());
+                PileObject.Add(new MillennialMagicBook());
+                PileObject.Add(new ShieldInMithril());
+                PileObject.Add(new BigWall());
+                    //Armor
+                PileObject.Add(new ChainmailInMithril());
+                PileObject.Add(new BreatplateOfSelfConfident());
+                    //Helmet
+                PileObject.Add(new HelmetInMithril());
+                PileObject.Add(new MagicHat());
+                //Shoes
+                PileObject.Add(new ShoesInMithril());
+                PileObject.Add(new FlyingShoes());
+                    //Amulette
+                PileObject.Add(new BeltInMithril());
+                PileObject.Add(new TheGraal());
+                PileObject.Add(new PetsTotem());
+                    //Pets
+                PileObject.Add(new GreatWhiteWolf());
             }
             for (int i = 0; i < 3; i++)
             {
                 //Common
-                PileObject.Add(new GreekSword());
-                PileObject.Add(new MagicOrb());
-                PileObject.Add(new SmallShield());
-                PileObject.Add(new MagicShield());
-                PileObject.Add(new Chestplate());
-                PileObject.Add(new MagicChestplate());
-                PileObject.Add(new MagicHelmet());
-                PileObject.Add(new BasicHelmet());
-                PileObject.Add(new NormalShoes());
+                    //Amulette
+                PileObject.Add(new GreekNecklace());
                 PileObject.Add(new StrengthCollar());
                 PileObject.Add(new MagicRing());
+                    //Pets
                 PileObject.Add(new SmallWolf());
                 PileObject.Add(new TotemOfStrength());
                 PileObject.Add(new GratefulTraveler());
@@ -91,7 +135,6 @@ namespace Jeu_de_Socitété___Izulmha
             }
             for (int i = 0; i < 3; i++)
             {
-                PileSpell.Add(new CounterSpell()); 
                 PileSpell.Add(new MonsterBoostCommon());
                 PileSpell.Add(new HealFlask());
             }
@@ -114,8 +157,6 @@ namespace Jeu_de_Socitété___Izulmha
                 PileMonster.Add(new GraveHaunt());
                 PileMonster.Add(new MutantRats());
                 PileMonster.Add(new BrigandGroup());
-
-                DeffausseMonster.Add(new GreatSandScorpion());
             }
         }
 

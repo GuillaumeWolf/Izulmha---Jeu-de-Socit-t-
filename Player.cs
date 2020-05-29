@@ -12,11 +12,12 @@ namespace Jeu_de_Socitété___Izulmha
         #region public properties
         //Name/class/race
         public string PlayerName;
-        public Classes PlayerClass;
+        public Classe PlayerClass;
         public int ClassLevel = 1;
         public Races PlayerRace;
         public int RaceLevel = 1;
         public int PlayerNumber;
+        List<Player> _listofPlayer;
         //Stats
             //Vie
         public int BasicHP = 8;
@@ -49,7 +50,7 @@ namespace Jeu_de_Socitété___Izulmha
         public int cardToDraw = 0;
 
         //Etat
-        public enum PlayerStatsEnum 
+        public enum PlayerStatesEnum 
         { 
             NotIsTurn, 
             //1
@@ -71,10 +72,11 @@ namespace Jeu_de_Socitété___Izulmha
             //4
             SellingGivingCard,
             //Autre
-            ChoosingPlayer
+            ChoosingPlayer,
+            ChoosingObjectPlayer
         }
-        public PlayerStatsEnum PlayerState;
-        public PlayerStatsEnum LastStates;
+        public PlayerStatesEnum PlayerState;
+        public PlayerStatesEnum LastStates;
 
         //Fight
         public bool FightWithStrength = true;
@@ -83,29 +85,34 @@ namespace Jeu_de_Socitété___Izulmha
         #endregion public properties
 
 
-        public Player(string nameInput, Classes classofplayer, Races raceofplayer)
+        public Player(string nameInput, Classe classofplayer, Races raceofplayer, List<Player> listofPlayer)
         {
             PlayerName = nameInput;
             PlayerClass = classofplayer;
             PlayerRace = raceofplayer;
             HP = BasicHP;
-            Mana = ManaGemme;
-            Strength = BasicStrength;
-            Power = BasicPower;
+            Strength = BasicStrength + PlayerClass.StrengthBonus;
+            Power = BasicPower + PlayerClass.PowerBonus ;
+            Mana = ManaGemme + PlayerClass.ManaBonus;
+
+            _listofPlayer = listofPlayer;
         }
 
         //Crée un joueur
-        public static Player CreatNewRandomPlayer()
+        public static Player CreatNewRandomPlayer(List<Player> listofPlayer)
         {
             //Name
             Console.Write("Enter your name: \n --> ");
             string rep1 = Console.ReadLine();
             //string rep1 = ChooseName();
             //Class
-            Classes classofplayer = null;
-            int n = Aleatoire.RandomInt(Classes.ClassPoss.Count);
-            classofplayer = Classes.ClassPoss[n];
-            Classes.ClassPoss.RemoveAt(n);
+            Classe classofplayer = null;
+            int n = Aleatoire.RandomInt(Classe.ClassPoss.Count);
+            classofplayer = Classe.ClassPoss[n];
+            Classe.ClassPoss.RemoveAt(n);
+
+            // todo remove
+            classofplayer = new Archer();
 
             //Race
             Races raceofplayer = null;
@@ -114,7 +121,7 @@ namespace Jeu_de_Socitété___Izulmha
             Races.RacePoss.RemoveAt(n);
 
             //Instancie le Player
-            Player p1 = new Player(rep1, classofplayer, raceofplayer);
+            Player p1 = new Player(rep1, classofplayer, raceofplayer, listofPlayer);
             return p1;
         }
         private static void CreatNewPlayer()
@@ -150,21 +157,22 @@ namespace Jeu_de_Socitété___Izulmha
             Console.WriteLine("You get 1 Mana Gemme. And the other are fill. You got {0} Mana.", ManaGemme);
             //1
             Console.Write("\n1. Draw Card");
-            PlayerState = PlayerStatsEnum.Drawing;
+            PlayerState = PlayerStatesEnum.Drawing;
             C.AllCommande(this);
             C.AllCommande(this);
 
 
             //2
             Console.Write("\n2. Play Card");
-            PlayerState = PlayerStatsEnum.PlayingObject;
+            PlayerState = PlayerStatesEnum.PlayingObject;
             C.AllCommande(this);
 
 
             //3
             Console.Write("\n3. Fight a random Monster. ");
             Monster m1 =  Cards.DrawMonster(pilesdeCartes);
-            
+            m1 = PlayerClass.ApplayAbilityDrawMonster(this, m1, pilesdeCartes);
+
             if (m1 is NormalMonster)
             {
                 FightMonster = m1 as NormalMonster;
@@ -176,33 +184,47 @@ namespace Jeu_de_Socitété___Izulmha
             Console.Write("You are facing ", FightMonster.Name);
             FightMonster.ShowCard();
 
-            PlayerState = PlayerStatsEnum.ChoosingDamage;
+            PlayerState = PlayerStatesEnum.ChoosingDamage;
             C.AllCommande(this); 
-            PlayerState = PlayerStatsEnum.ChoosingPets;
+            PlayerState = PlayerStatesEnum.ChoosingPets;
             C.AllCommande(this);
-            PlayerState = PlayerStatsEnum.Fighting;
+            PlayerState = PlayerStatesEnum.Fighting;
+            PlayerClass.ApplyAbilityStartFight(this);
             C.AllCommande(this);
 
+            //Pets
+            for (int i = 0; i < _petsPlayed.Count; )
+            {
+                _petsPlayed[i].EndOfAFight();
+                if (_petsPlayed[i].HP <= 0)
+                {
+                    Console.WriteLine("Your {0} is dead. ", _petsPlayed[i].Name);
+                    _petsPlayed.RemoveAt(i);
+                    continue;
+                }
+                i++;
+            }
 
             //4
             Console.Write("\n4. Selling Object (per 500 gold draw a Card).");
-            while (Cards.Cards.Count > maxCardInHand)
+            do
             {
-                PlayerState = PlayerStatsEnum.SellingGivingCard;
+                PlayerState = PlayerStatesEnum.SellingGivingCard;
                 C.AllCommande(this);
-                if(Cards.Cards.Count > maxCardInHand)
+                while (cardToDraw > 0)
+                {
+                    C.AllCommande(this);
+                    cardToDraw--;
+                }
+                if (Cards.Cards.Count > maxCardInHand)
                 {
                     Console.WriteLine("You have to much Cards. Sell them, or throw some.");
                 }
-            }
-            while(cardToDraw > 0)
-            {
-                C.AllCommande(this);
-                cardToDraw--;
-            }
+                SellingGold = 0;
+            } while (Cards.Cards.Count > maxCardInHand);
 
             //5
-            PlayerState = PlayerStatsEnum.NotIsTurn;
+            PlayerState = PlayerStatesEnum.NotIsTurn;
 
         }
 
@@ -211,13 +233,13 @@ namespace Jeu_de_Socitété___Izulmha
         //Methode du player en jeu
         public void WritePlayerDescritpion()
         {
-            Console.WriteLine("Hello, my name is {0} the {1} and I am a {2}.", PlayerName, PlayerRace.Name, PlayerClass.Name);
+            Console.WriteLine("{0} the {1} {2}. ", PlayerName, PlayerClass.Name, PlayerRace.Name);
         }
         public void WritePlayerStats()
         {
             int x = 1;
             x += 2;
-            if (PlayerState != PlayerStatsEnum.Fighting)
+            if (PlayerState != PlayerStatesEnum.Fighting)
             {
                 Console.WriteLine("{0} the {1} {2}:", PlayerName, PlayerClass.Name, PlayerRace.Name);
                 int? totalStrength = Strength;
@@ -283,7 +305,7 @@ namespace Jeu_de_Socitété___Izulmha
                 if (longPets == 0) { Console.Write("No Pets. "); }
 
                 Console.WriteLine();
-                if (PlayerState != PlayerStatsEnum.Fighting)
+                if (PlayerState != PlayerStatesEnum.Fighting)
                 {
                     Console.WriteLine("Strength: {0}, Power: {1}, Mana: {2}/{3}.", GetTotalPower(), GetTotalPower(), totalMana, totalManaGemme);
                 }
@@ -346,6 +368,7 @@ namespace Jeu_de_Socitété___Izulmha
                     totalStrength += (_petsPlayed[i] as TotemOfStrength).GivePlayerStrength();
                 }
             }
+            totalStrength += PlayerClass.ApplyAbilityCountStrength(this);
             return totalStrength;
         }
         public int? GetTotalPower()
@@ -442,5 +465,23 @@ namespace Jeu_de_Socitété___Izulmha
         {
             _petsPlayed.Add(p1);
         }
+
+
+        //Joue les Spell
+        public PlayCardResult PlaySpell(Spell s1)
+        {
+            PlayCardResult result = PlayCardResult.OK;
+            result = s1.CheckCanPlay(_listofPlayer);
+            if (result == PlayCardResult.CantCastSpell)
+            {
+                return result;
+            }
+            else
+            {
+                s1.CastSpell();
+                return result;
+            }
+        }
+
     }
 }

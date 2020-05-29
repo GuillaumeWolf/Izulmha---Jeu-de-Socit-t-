@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Jeu_de_Socitété___Izulmha
 {
-    public enum PlayCardResult { OK, NoEnoughHand, NoEnoughBody, NoEnoughHead, NoEnoughFeet };
+    public enum PlayCardResult { OK, NoEnoughHand, NoEnoughBody, NoEnoughHead, NoEnoughFeet , CantCastSpell, IsAnArcher };
     class PlayerHand
     {
         public List<Carte> Cards = new List<Carte>();
@@ -12,6 +12,8 @@ namespace Jeu_de_Socitété___Izulmha
         public PlayCardResult PlayCard(Carte c1, Player p1)
         {
             PlayCardResult canplay = PlayCardResult.OK;
+
+            //Joue la carte dans player
             if (c1 is Weapon)
             {
                 canplay = p1.PlayWeapon(c1 as Weapon);
@@ -36,29 +38,47 @@ namespace Jeu_de_Socitété___Izulmha
             {
                 p1.PlayPets(c1 as Pets);
             }
+            if (c1 is Spell)
+            {
+                p1.PlaySpell(c1 as Spell);
+            }
+            //Regarde sil y a pas eu d'erreur sinon return lerreur
             if (canplay == PlayCardResult.NoEnoughHand)
             {
-                p1.PlayerState = Player.PlayerStatsEnum.ChangingWeapon;
+                p1.PlayerState = Player.PlayerStatesEnum.ChangingWeapon;
                 return PlayCardResult.NoEnoughHand;
             }
             if (canplay == PlayCardResult.NoEnoughBody)
             {
-                p1.PlayerState = Player.PlayerStatsEnum.ChangingArmor;
+                p1.PlayerState = Player.PlayerStatesEnum.ChangingArmor;
                 return PlayCardResult.NoEnoughBody;
             }
             if (canplay == PlayCardResult.NoEnoughHead)
             {
-                p1.PlayerState = Player.PlayerStatsEnum.ChangingHelmet;
+                p1.PlayerState = Player.PlayerStatesEnum.ChangingHelmet;
                 return PlayCardResult.NoEnoughHead;
             }
             if (canplay == PlayCardResult.NoEnoughFeet)
             {
-                p1.PlayerState = Player.PlayerStatsEnum.ChangingShoe;
+                p1.PlayerState = Player.PlayerStatesEnum.ChangingShoe;
                 return PlayCardResult.NoEnoughFeet;
             }
-            Cards.Remove(c1);
-            p1.Mana -= c1.Cost;
-            Console.WriteLine("You play a {0}. It cost {1} Mana. You have {2} Mana.", c1.Name, c1.Cost, p1.Mana);
+            if(canplay == PlayCardResult.CantCastSpell)
+            {
+                p1.PlayerState = p1.LastStates;
+                return PlayCardResult.NoEnoughFeet;
+            }
+
+            if (c1 is Object)
+            {
+                Cards.Remove(c1);
+                p1.Mana -= c1.Cost;
+                Console.WriteLine("You play a {0}. It cost {1} Mana. You have {2} Mana.", c1.Name, c1.Cost, p1.Mana);
+            }
+            else if ( c1 is Spell)
+            {
+                Console.WriteLine("You play a {0}. ", c1.Name);
+            }
             return PlayCardResult.OK;
         }
         public void DrawCard(PilesdeCarte pilesdeCartes,  int n, string name)

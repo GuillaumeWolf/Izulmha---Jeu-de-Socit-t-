@@ -28,7 +28,7 @@ namespace Jeu_de_Socitété___Izulmha
         private void Prepare()
         {
             //Préparation
-            Classes.FillClassList();
+            Classe.FillClassList();
             Races.FillRaceList();
 
             //début du jeu
@@ -38,16 +38,20 @@ namespace Jeu_de_Socitété___Izulmha
             for (int i = 0; i < NumberOfPlayer; i++)
             {
                 Console.WriteLine("\nPlayer {0}:\n", i+1);
-                Player p1 = Player.CreatNewRandomPlayer();
+                Player p1 = Player.CreatNewRandomPlayer(_listOfPlayer);
                 _listOfPlayer.Add(p1);
                 p1.PlayerNumber = i+1;
 
             }
             for (int i = 0; i < NumberOfPlayer; i++)
             {
-                //_listOfPlayer[i].WritePlayerDescritpion();
-                Console.WriteLine("Player {0}:", i + 1);
-                _listOfPlayer[i].WritePlayerStats();
+                Console.Write("Player {0}: ", i + 1);
+                _listOfPlayer[i].WritePlayerDescritpion();
+                Console.WriteLine();
+                _listOfPlayer[i].PlayerClass.ApplayAbilitiyStartGame(_listOfPlayer[i]);
+                //Piocher des cartes
+                //_listOfPlayer[i].Cards.DrawCard(_pilesdeCartes, 3, "Object");
+                //_listOfPlayer[i].Cards.DrawCard(_pilesdeCartes, 3, "Spell");
                 Console.WriteLine();
             }
             C = new Commande(_pilesdeCartes, _listOfPlayer);
