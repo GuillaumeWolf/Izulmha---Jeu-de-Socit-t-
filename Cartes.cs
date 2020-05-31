@@ -22,7 +22,7 @@ namespace Jeu_de_Socitété___Izulmha
         public enum RarityEnum { Common, Rare, Mythical, Legendary, ClassMemberShip };
 
         //Cost
-        public int Cost { get; private set; }
+        public int Cost { get; set; }
 
         #endregion
         protected Carte(string pileCarte, string categorie, string name, RarityEnum rarity)
@@ -78,12 +78,14 @@ namespace Jeu_de_Socitété___Izulmha
         public List<Object> ObjectListPossibleValues = new List<Object>();
         public List<Player> PlayerListPossibleValue = new List<Player>();
 
+        public bool isBeingSelled = false;
+
         protected Spell(string categorie, string name, RarityEnum rarity) : base("Spell", categorie, name, rarity)
         {
 
         }
 
-        public virtual PlayCardResult CheckCanPlay(List<Player> lp1)
+        public virtual PlayCardResult CheckCanPlay(List<Player> lp1, Player p1)
         {
             PlayCardResult result = PlayCardResult.OK;
             return result;
@@ -100,6 +102,10 @@ namespace Jeu_de_Socitété___Izulmha
     abstract class Monster : Carte
     {
         protected Monster(string categorie, string name, RarityEnum rarity) : base("Monster", categorie, name, rarity)
+        {
+
+        }
+        public virtual void LostConsequencesFunc(Player p1)
         {
 
         }
@@ -300,7 +306,9 @@ namespace Jeu_de_Socitété___Izulmha
     {
         //Dégats 
         public int Puissance;
+        public int BasicPuissance;
         public int HP;
+        public int BasicHP;
         //Mana
         public int? Mana;
         //Property
@@ -588,6 +596,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public SmallWolf() : base("Small Wolf", RarityEnum.Common, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 3;
+            BasicHP = 1;
             Puissance = 3;
             HP = 1;
         }
@@ -596,6 +606,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public TotemOfStrength() : base("Totem Of Strength", RarityEnum.Common, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 1;
+            BasicHP = 2;
             Puissance = 1;
             HP = 2;
             Utilities = "Active: +1 Strength. ";
@@ -610,6 +622,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public GratefulTraveler() : base("Grateful Traveler", RarityEnum.Common, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 2;
+            BasicHP = 2;
             Puissance = 2;
             HP = 2;
         }
@@ -625,18 +639,23 @@ namespace Jeu_de_Socitété___Izulmha
             Utility = "Destroy a Common Weapon. ";
 
         }
-        public override PlayCardResult CheckCanPlay(List<Player> lp1)
+        public override PlayCardResult CheckCanPlay(List<Player> lp1, Player p1)
         {
             PlayCardResult result = PlayCardResult.CantCastSpell;
             int countweapon = 1;
             for (int i = 0; i < lp1.Count; i++)
             {
+                if (lp1[i] == p1)
+                {
+                    continue;
+                }
                 for (int j = 0; j < lp1[i]._weaponsPlayed.Count; j++)
                 {
                     if (lp1[i]._weaponsPlayed[j].Rarity == RarityEnum.Common)
                     {
                         result = PlayCardResult.OK;
                         string weaponsss = "w" + Convert.ToString(countweapon);
+                        countweapon++;
                         StringListPossibleValues.Add(weaponsss);
                         ObjectListPossibleValues.Add(lp1[i]._weaponsPlayed[j]);
                         PlayerListPossibleValue.Add(lp1[i]);
@@ -657,7 +676,10 @@ namespace Jeu_de_Socitété___Izulmha
                 {
                     int indexx = StringListPossibleValues.IndexOf(rep);
                     Console.WriteLine("You destroy the {0} of {1}. ", ObjectListPossibleValues[indexx].Name, PlayerListPossibleValue[indexx].PlayerName);
-                    PlayerListPossibleValue[indexx].Cards.Cards.Remove(ObjectListPossibleValues[indexx]);
+                    PlayerListPossibleValue[indexx]._weaponsPlayed.Remove(ObjectListPossibleValues[indexx] as Weapon);
+                    StringListPossibleValues.Clear();
+                    ObjectListPossibleValues.Clear();
+                    PlayerListPossibleValue.Clear();
                     break;
                 }
                 else
@@ -979,9 +1001,11 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public VikingBear() : base("Viking Bear", RarityEnum.Rare, SpecialCardTypeEnum.Viking)
         {
+            BasicPuissance = 2;
+            BasicHP = 1;
             Puissance = 2;
             HP = 1;
-            Utilities = "When Summoned, steal a Viking ";
+            Utilities = "When Summoned, steal a Viking Object.";
         }
         public override void WhenSummoned()
         {
@@ -996,6 +1020,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public Reel() : base("Reel", RarityEnum.Rare, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 4;
+            BasicHP = 1;
             Puissance = 4;
             HP = 1;
             Utilities = "When I’m played, Summon a common card for free. ";
@@ -1005,6 +1031,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public WolfPack() : base("Wolf Pack", RarityEnum.Rare, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 2;
+            BasicHP = 3;
             Puissance = 2;
             HP = 3;
             Utilities = "If you have a “Small Wolf”, my stats are 4/4. ";
@@ -1014,6 +1042,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public WildParrot() : base("Wild Parrot", RarityEnum.Rare, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 6;
+            BasicHP = 1;
             Puissance = 6;
             HP = 1;
             Utilities = "When I die, deal 1 Damage to a random Player, even you. ";
@@ -1321,6 +1351,8 @@ namespace Jeu_de_Socitété___Izulmha
     {
         public GreatWhiteWolf() : base("Great White Wolf", RarityEnum.Mythical, SpecialCardTypeEnum.Nothing)
         {
+            BasicPuissance = 4;
+            BasicHP = 2;
             Puissance = 4;
             HP = 2;
             Utilities = "Trainer: When Summoned: Puissance = 6 / HP = 3.";

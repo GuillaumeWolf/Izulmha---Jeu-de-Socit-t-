@@ -41,6 +41,7 @@ namespace Jeu_de_Socitété___Izulmha
                 Player p1 = Player.CreatNewRandomPlayer(_listOfPlayer);
                 _listOfPlayer.Add(p1);
                 p1.PlayerNumber = i+1;
+                p1._pilesdeCarte = _pilesdeCartes;
 
             }
             for (int i = 0; i < NumberOfPlayer; i++)
@@ -48,7 +49,7 @@ namespace Jeu_de_Socitété___Izulmha
                 Console.Write("Player {0}: ", i + 1);
                 _listOfPlayer[i].WritePlayerDescritpion();
                 Console.WriteLine();
-                _listOfPlayer[i].PlayerClass.ApplayAbilitiyStartGame(_listOfPlayer[i]);
+                _listOfPlayer[i].PlayerClass.ApplyAbilitiyStartGame(_listOfPlayer[i]);
                 //Piocher des cartes
                 //_listOfPlayer[i].Cards.DrawCard(_pilesdeCartes, 3, "Object");
                 //_listOfPlayer[i].Cards.DrawCard(_pilesdeCartes, 3, "Spell");

@@ -81,12 +81,13 @@ namespace Jeu_de_Socitété___Izulmha
             }
             return PlayCardResult.OK;
         }
-        public void DrawCard(PilesdeCarte pilesdeCartes,  int n, string name)
+        public void DrawCard(PilesdeCarte pilesdeCartes,  int n, string name, Player p1)
         {
             Carte c;
             for (int i = 0; i < n; i++)
             {
                 c = pilesdeCartes.GetRandomCard(name);
+                p1.PlayerClass.ApplyAbilitiyDrawing(p1, c);
                 Cards.Add(c);
             }
         }
